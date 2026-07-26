@@ -1,0 +1,92 @@
+{
+  "results": [
+    {
+      "case_id": "backend-dual-write",
+      "deferments": [
+        {
+          "title": "Remove mobile v1 dual-write",
+          "action": "Stop synchronizing customer.LegacyName during customer writes.",
+          "blocker": "Mobile v1 still reads LegacyName.",
+          "cue_kind": "event",
+          "cue_path": "",
+          "cue_value": "mobile-v1-retired",
+          "evidence": [
+            "Plan: Keep LegacyName synchronized until the mobile-v1-retired event is published.",
+            "Final: The dual-write remains intentionally because mobile v1 still reads LegacyName.",
+            "Diff: customer.LegacyName = input.Name; // mobile v1 compatibility"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "frontend-api-fallback",
+      "deferments": [
+        {
+          "title": "Remove legacy user name fallback",
+          "action": "Remove the fallback from user.displayName to user.name.",
+          "blocker": "The generated User contract still contains the old name field.",
+          "cue_kind": "file_not_contains",
+          "cue_path": "src/generated/User.ts",
+          "cue_value": "name:",
+          "evidence": [
+            "Plan: Use the old name field only until src/generated/User.ts drops the name: property.",
+            "Final: Remove the fallback when src/generated/User.ts no longer contains name:.",
+            "Diff: const displayName = user.displayName ?? user.name;"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "ui-missing-token",
+      "deferments": [
+        {
+          "title": "Replace temporary pending-payment color",
+          "action": "Replace the approved temporary color in PendingPayment with color.status.warning.",
+          "blocker": "The design-system warning token has not shipped.",
+          "cue_kind": "file_contains",
+          "cue_path": "src/ui/theme.ts",
+          "cue_value": "color.status.warning",
+          "evidence": [
+            "Task: Add the pending-payment state before the design-system warning token ships.",
+            "Plan: Use the approved temporary color and migrate when src/ui/theme.ts contains color.status.warning.",
+            "Final: Replace it once src/ui/theme.ts exports color.status.warning.",
+            "Diff: const pendingColor = \"#D97706\";"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "roadmap-next-phase",
+      "deferments": [
+        {
+          "title": "Wire orders pagination",
+          "action": "Implement phase 2 by wiring pagination.",
+          "blocker": "The list-orders AVP gate has not passed.",
+          "cue_kind": "event",
+          "cue_path": "",
+          "cue_value": "avp:list-orders:passed",
+          "evidence": [
+            "Plan: Phase 2: wire pagination after event avp:list-orders:passed.",
+            "Final: Phase 2 remains blocked until event avp:list-orders:passed."
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "vague-improvement",
+      "deferments": []
+    },
+    {
+      "case_id": "unfinished-current-scope",
+      "deferments": []
+    },
+    {
+      "case_id": "permanent-fallback",
+      "deferments": []
+    },
+    {
+      "case_id": "already-resolved",
+      "deferments": []
+    }
+  ]
+}

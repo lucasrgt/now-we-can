@@ -1,0 +1,110 @@
+[
+  {
+    "id": "backend-dual-write",
+    "envelope": {
+      "task": "Migrate customer writes to DisplayName while mobile v1 remains active.",
+      "plan": "Keep LegacyName synchronized until the mobile-v1-retired event is published.",
+      "final": "Implemented DisplayName. The dual-write remains intentionally because mobile v1 still reads LegacyName.",
+      "diff": "+ customer.DisplayName = input.Name;\n+ customer.LegacyName = input.Name; // mobile v1 compatibility"
+    },
+    "expected": {
+      "deferred": true,
+      "cue_kind": "event",
+      "cue_path": "",
+      "cue_value": "mobile-v1-retired"
+    }
+  },
+  {
+    "id": "frontend-api-fallback",
+    "envelope": {
+      "task": "Consume the generated User contract during the displayName migration.",
+      "plan": "Use the old name field only until src/generated/User.ts drops the name: property.",
+      "final": "The frontend accepts both fields for now. Remove the fallback when src/generated/User.ts no longer contains name:.",
+      "diff": "+ const displayName = user.displayName ?? user.name;\n+ // generated client transition"
+    },
+    "expected": {
+      "deferred": true,
+      "cue_kind": "file_not_contains",
+      "cue_path": "src/generated/User.ts",
+      "cue_value": "name:"
+    }
+  },
+  {
+    "id": "ui-missing-token",
+    "envelope": {
+      "task": "Add the pending-payment state before the design-system warning token ships.",
+      "plan": "Use the approved temporary color and migrate when src/ui/theme.ts contains color.status.warning.",
+      "final": "The temporary color is isolated in PendingPayment. Replace it once src/ui/theme.ts exports color.status.warning.",
+      "diff": "+ const pendingColor = \"#D97706\";\n+ export function PendingPayment() { /* uses pendingColor */ }"
+    },
+    "expected": {
+      "deferred": true,
+      "cue_kind": "file_contains",
+      "cue_path": "src/ui/theme.ts",
+      "cue_value": "color.status.warning"
+    }
+  },
+  {
+    "id": "roadmap-next-phase",
+    "envelope": {
+      "task": "Finish phase 1 of the paginated orders roadmap.",
+      "plan": "Phase 1: list endpoint. Phase 2: wire pagination after event avp:list-orders:passed.",
+      "final": "Phase 1 is complete. Phase 2 remains blocked until event avp:list-orders:passed.",
+      "diff": "+ app.MapGet(\"/orders\", ListOrders.Handle);"
+    },
+    "expected": {
+      "deferred": true,
+      "cue_kind": "event",
+      "cue_path": "",
+      "cue_value": "avp:list-orders:passed"
+    }
+  },
+  {
+    "id": "vague-improvement",
+    "envelope": {
+      "task": "Render the account dashboard.",
+      "plan": "Implement the requested dashboard.",
+      "final": "Done. In the future we could improve performance and make the visuals even nicer.",
+      "diff": "+ export function Dashboard() { return <AccountSummary />; }"
+    },
+    "expected": {
+      "deferred": false
+    }
+  },
+  {
+    "id": "unfinished-current-scope",
+    "envelope": {
+      "task": "Add save and cancel actions to the profile form.",
+      "plan": "Implement both actions in this task.",
+      "final": "Save works. Cancel remains for later.",
+      "diff": "+ <Button onClick={save}>Save</Button>"
+    },
+    "expected": {
+      "deferred": false
+    }
+  },
+  {
+    "id": "permanent-fallback",
+    "envelope": {
+      "task": "Support offline-first profile viewing.",
+      "plan": "The cached profile is a permanent product behavior when the network is unavailable.",
+      "final": "Added the required permanent offline fallback.",
+      "diff": "+ return networkProfile ?? cachedProfile;"
+    },
+    "expected": {
+      "deferred": false
+    }
+  },
+  {
+    "id": "already-resolved",
+    "envelope": {
+      "task": "Remove the legacy checkout after rollout completion.",
+      "plan": "The rollout-100 event already occurred. Remove the flag and old component now.",
+      "final": "Removed the flag and LegacyCheckout. No follow-up remains.",
+      "diff": "- return flag ? <NewCheckout /> : <LegacyCheckout />;\n+ return <NewCheckout />;"
+    },
+    "expected": {
+      "deferred": false
+    }
+  }
+]

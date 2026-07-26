@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["results"],
+  "properties": {
+    "results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["case_id", "deferments"],
+        "properties": {
+          "case_id": { "type": "string" },
+          "deferments": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "title",
+                "action",
+                "blocker",
+                "cue_kind",
+                "cue_path",
+                "cue_value",
+                "evidence"
+              ],
+              "properties": {
+                "title": { "type": "string" },
+                "action": { "type": "string" },
+                "blocker": { "type": "string" },
+                "cue_kind": {
+                  "enum": [
+                    "event",
+                    "path_exists",
+                    "path_absent",
+                    "file_contains",
+                    "file_not_contains"
+                  ]
+                },
+                "cue_path": { "type": "string" },
+                "cue_value": { "type": "string" },
+                "evidence": {
+                  "type": "array",
+                  "items": { "type": "string" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

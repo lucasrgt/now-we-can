@@ -1,0 +1,14 @@
+{
+  "providers": {
+    "codex": {
+      "true_positives": 4,
+      "false_positives": 0,
+      "false_negatives": 0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "exact_cue_accuracy": 1.0,
+      "failures": []
+    }
+  }
+}

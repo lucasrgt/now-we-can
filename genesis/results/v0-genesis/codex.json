@@ -1,0 +1,64 @@
+{
+  "results": [
+    {
+      "case_id": "backend-dual-write",
+      "deferments": [
+        {
+          "title": "Remove mobile v1 dual-write compatibility",
+          "action": "Stop synchronizing LegacyName on customer writes.",
+          "blocker": "Mobile v1 still reads LegacyName.",
+          "cue_kind": "event",
+          "cue_path": "",
+          "cue_value": "mobile-v1-retired",
+          "evidence": [
+            "Plan: Keep LegacyName synchronized until the mobile-v1-retired event is published.",
+            "Final: The dual-write remains intentionally because mobile v1 still reads LegacyName.",
+            "Diff: customer.LegacyName = input.Name; // mobile v1 compatibility"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "frontend-api-fallback",
+      "deferments": []
+    },
+    {
+      "case_id": "ui-missing-token",
+      "deferments": []
+    },
+    {
+      "case_id": "roadmap-next-phase",
+      "deferments": [
+        {
+          "title": "Wire frontend order pagination",
+          "action": "Implement phase 2 by wiring pagination in the frontend.",
+          "blocker": "The list endpoint has not passed AVP.",
+          "cue_kind": "event",
+          "cue_path": "",
+          "cue_value": "avp:list-endpoint:passed",
+          "evidence": [
+            "Plan: Phase 2: wire pagination in the frontend after AVP proves the list endpoint.",
+            "Final: Phase 2 remains blocked on the list endpoint AVP verdict.",
+            "Diff: app.MapGet(\"/orders\", ListOrders.Handle);"
+          ]
+        }
+      ]
+    },
+    {
+      "case_id": "vague-improvement",
+      "deferments": []
+    },
+    {
+      "case_id": "unfinished-current-scope",
+      "deferments": []
+    },
+    {
+      "case_id": "permanent-fallback",
+      "deferments": []
+    },
+    {
+      "case_id": "already-resolved",
+      "deferments": []
+    }
+  ]
+}
