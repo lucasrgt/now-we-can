@@ -67,7 +67,7 @@ jobs:
         shell: pwsh
         run: |
           $packages = (cargo metadata --no-deps --format-version 1 | ConvertFrom-Json).packages
-          $version = ($packages | Where-Object name -eq "not-yet").version
+          $version = ($packages | Where-Object name -eq "wake-me-when").version
           if ("v$version" -ne "${{ github.ref_name }}") {
             throw "Tag ${{ github.ref_name }} does not match package version $version"
           }
@@ -79,23 +79,23 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          binary="$PWD/target/${{ matrix.target }}/release/notyet"
-          docker run --rm --volume "$binary:/usr/local/bin/notyet:ro" \
-            debian:bookworm-slim /usr/local/bin/notyet --version
+          binary="$PWD/target/${{ matrix.target }}/release/wmw"
+          docker run --rm --volume "$binary:/usr/local/bin/wmw:ro" \
+            debian:bookworm-slim /usr/local/bin/wmw --version
       - name: Build native release binary
         if: runner.os != 'Linux'
         run: cargo build --release --locked --target ${{ matrix.target }}
       - name: Package binary
         shell: pwsh
         run: |
-          $name = "notyet-${{ matrix.target }}"
+          $name = "wmw-${{ matrix.target }}"
           New-Item -ItemType Directory -Path "dist/$name" | Out-Null
-          Copy-Item "target/${{ matrix.target }}/release/notyet${{ matrix.suffix }}" "dist/$name/"
+          Copy-Item "target/${{ matrix.target }}/release/wmw${{ matrix.suffix }}" "dist/$name/"
           Copy-Item README.md, LICENSE "dist/$name/"
           Compress-Archive -Path "dist/$name" -DestinationPath "dist/$name.zip"
       - uses: actions/upload-artifact@v7
         with:
-          name: notyet-${{ matrix.target }}
+          name: wmw-${{ matrix.target }}
           path: dist/*.zip
           if-no-files-found: error
 
@@ -123,5 +123,5 @@ jobs:
             dist/*.zip \
             dist/SHA256SUMS \
             --verify-tag \
-            --title "Not Yet ${GITHUB_REF_NAME}" \
+            --title "Wake Me When ${GITHUB_REF_NAME}" \
             --generate-notes

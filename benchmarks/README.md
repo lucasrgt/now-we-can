@@ -1,4 +1,4 @@
-# Not Yet benchmarks
+# Wake Me When benchmarks
 
 The suite tests three different claims without blending their metrics:
 
@@ -11,10 +11,13 @@ The suite tests three different claims without blending their metrics:
 
 ## Published v0.1.0 results
 
+These immutable reports were recorded under the former Not Yet name. Current
+reproduction commands use Wake Me When and `wmw`.
+
 | Run | Result | Evidence |
 | --- | --- | --- |
 | Genesis capture | PASS | 4/4 positives, 4/4 negatives, and 4/4 exact cues with Codex |
-| [Paired agent](results/v0.1.0-paired-gpt-5.3-codex-spark/REPORT.md) | PASS | 5/5 observed baseline misses became passing Not Yet arms |
+| [Paired agent](results/v0.1.0-paired-gpt-5.3-codex-spark/REPORT.md) | PASS | 5/5 observed baseline misses became passing Wake Me When arms |
 | [1,024-deferment stress](results/v0.1.0-stress-1024/REPORT.md) | PASS | 128/128 exact event probes and all five cue kinds |
 | [10,000-deferment stress](results/v0.1.0-stress-10000/REPORT.md) | PASS | 64/64 exact event probes and all fail-closed checks |
 
@@ -32,19 +35,19 @@ earlier work:
 | Arm | Additional state |
 | --- | --- |
 | Baseline | Ordinary repository instructions only |
-| Not Yet | The same seed plus one disclosed pre-captured deferment and managed instructions |
+| Wake Me When | The same seed plus one disclosed pre-captured deferment and managed instructions |
 
 Both arms receive the same immediate task, model, limits, and randomized
-ordering. In the Not Yet arm, the harness runs `notyet wake`, injects exactly
-the due obligation, and runs `notyet check` after the agent. A deterministic
+ordering. In the Wake Me When arm, the harness runs `wmw wake`, injects exactly
+the due obligation, and runs `wmw check` after the agent. A deterministic
 evaluator outside both repositories inspects the requested change and the
 deferred change.
 
 A paired improvement counts only when the baseline completes the immediate
-task but misses the old obligation and the Not Yet arm completes both. A
+task but misses the old obligation and the Wake Me When arm completes both. A
 baseline pass is a tie, never an attributed prevention. The protocol also
-requires every Not Yet arm to wake exactly one item, execute `notyet resolve`,
-pass the external evaluator, and finish with a zero-exit `notyet check`.
+requires every Wake Me When arm to wake exactly one item, execute `wmw resolve`,
+pass the external evaluator, and finish with a zero-exit `wmw check`.
 
 The five cases cover backend dual-write retirement, a frontend generated
 contract fallback, a UI design token, a roadmap phase, and a retired feature
@@ -61,7 +64,7 @@ Build a Linux binary and the benchmark image, then run:
 
 ```bash
 docker build \
-  --tag notyet-benchmark:local \
+  --tag wmw-benchmark:local \
   --file benchmarks/Dockerfile \
   benchmarks
 
@@ -71,18 +74,18 @@ docker run --rm \
   --security-opt seccomp=unconfined \
   --mount type=bind,src="$HOME/.codex/auth.json",dst=/seed/auth.json,readonly \
   --mount type=bind,src="$(pwd)/benchmarks/paired.py",dst=/benchmarks/paired.py,readonly \
-  --mount type=bind,src="$(pwd)/target/x86_64-unknown-linux-gnu/release/notyet",dst=/usr/local/bin/notyet,readonly \
+  --mount type=bind,src="$(pwd)/target/x86_64-unknown-linux-gnu/release/wmw",dst=/usr/local/bin/wmw,readonly \
   --mount type=bind,src="$(pwd)/benchmarks/results/local-paired",dst=/output \
   --workdir /work \
-  notyet-benchmark:local \
+  wmw-benchmark:local \
   python3 /benchmarks/paired.py \
-  --notyet /usr/local/bin/notyet \
+  --wmw /usr/local/bin/wmw \
   --output /output \
   --model gpt-5.3-codex-spark \
   --work-parent /work
 ```
 
-The model is an explicit benchmark input, not a Not Yet dependency.
+The model is an explicit benchmark input, not a Wake Me When dependency.
 
 ## Large-corpus stress protocol
 
@@ -102,13 +105,13 @@ It also verifies:
 
 ```bash
 python3 benchmarks/stress.py \
-  --notyet target/release/notyet \
+  --wmw target/release/wmw \
   --count 1024 \
   --probes 128 \
   --output benchmarks/results/local-stress-1024
 
 python3 benchmarks/stress.py \
-  --notyet target/release/notyet \
+  --wmw target/release/wmw \
   --count 10000 \
   --probes 64 \
   --output benchmarks/results/local-stress-10000

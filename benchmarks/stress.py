@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministic large-corpus stress benchmark for Not Yet."""
+"""Deterministic large-corpus stress benchmark for Wake Me When."""
 
 from __future__ import annotations
 
@@ -45,7 +45,7 @@ def percentile(values, fraction):
 
 
 def identifier(index):
-    return f"notyet-stress-{index:05d}"
+    return f"wmw-stress-{index:05d}"
 
 
 def cue(index):
@@ -72,7 +72,7 @@ def deferment_text(index, commit, resolved=False):
         f"scopes = [{json.dumps(f'surface/{index % 64:02d}/**')}]",
         'evidence = ["stress evidence one", "stress evidence two"]',
         'recorded_at = "2026-01-01T00:00:00Z"',
-        'recorded_by = "Not Yet benchmark"',
+        'recorded_by = "Wake Me When benchmark"',
         f"recorded_commit = {json.dumps(commit)}",
     ]
     if resolved:
@@ -94,14 +94,14 @@ def deferment_text(index, commit, resolved=False):
 def initialize(root: Path, binary: Path, count: int):
     root.mkdir(parents=True, exist_ok=True)
     run(["git", "init", "-q"], root)
-    run(["git", "config", "user.name", "Not Yet Benchmark"], root)
+    run(["git", "config", "user.name", "Wake Me When Benchmark"], root)
     run(["git", "config", "user.email", "benchmark@example.test"], root)
     run(["git", "config", "core.autocrlf", "false"], root)
     (root / "README.md").write_text("# Stress fixture\n", encoding="utf-8", newline="\n")
     run(["git", "add", "."], root)
     run(["git", "commit", "-qm", "seed fixture"], root)
     commit = run(["git", "rev-parse", "HEAD"], root).stdout.strip()
-    directory = root / ".notyet" / "deferments"
+    directory = root / ".wmw" / "deferments"
     directory.mkdir(parents=True)
     signals = root / "signals"
     signals.mkdir()
@@ -201,7 +201,7 @@ def state_probes(binary: Path, root: Path, count: int):
 def fail_closed_probes(binary: Path, root: Path, output: Path, event: str):
     sleeping = run([binary, "check", "--json"], root, check=False)
     due = run([binary, "check", "--event", event, "--json"], root, check=False)
-    corrupt = root / ".notyet/deferments/corrupt.toml"
+    corrupt = root / ".wmw/deferments/corrupt.toml"
     corrupt.write_text("not = [valid", encoding="utf-8", newline="\n")
     broken = run([binary, "wake", "--json"], root, check=False)
     corrupt.unlink()
@@ -234,15 +234,15 @@ def collection_probe(binary: Path, root: Path, output: Path):
         }
         for index in range(21)
     ]
-    helper = root / ".notyet/judge.py"
+    helper = root / ".wmw/judge.py"
     helper.write_text(
         "import json,sys\nprint(json.dumps({'deferments':json.load(open(sys.argv[1],encoding='utf-8'))}))\n",
         encoding="utf-8",
         newline="\n",
     )
-    data = root / ".notyet/judge.json"
+    data = root / ".wmw/judge.json"
     command = json.dumps([sys.executable, str(helper), str(data)])
-    (root / ".notyet/config.local.toml").write_text(
+    (root / ".wmw/config.local.toml").write_text(
         f"schema = 1\n[judge]\ncommand = {command}\n", encoding="utf-8", newline="\n"
     )
 
@@ -271,7 +271,7 @@ def collection_probe(binary: Path, root: Path, output: Path):
 def render(summary):
     wake_data = summary["wake"]
     lines = [
-        "# Not Yet Large-Corpus Stress Benchmark",
+        "# Wake Me When Large-Corpus Stress Benchmark",
         "",
         f"Run from `{summary['started_at']}` to `{summary['completed_at']}` on `{summary['platform']}`.",
         "",
@@ -305,22 +305,22 @@ def render(summary):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--notyet", required=True, type=Path)
+    parser.add_argument("--wmw", required=True, type=Path)
     parser.add_argument("--count", required=True, type=int)
     parser.add_argument("--probes", required=True, type=int)
     parser.add_argument("--output", required=True, type=Path)
     args = parser.parse_args()
-    binary = args.notyet.resolve()
+    binary = args.wmw.resolve()
     output = args.output.resolve()
     if not binary.is_file():
-        raise SystemExit(f"notyet binary not found: {binary}")
+        raise SystemExit(f"wmw binary not found: {binary}")
     if args.count < 32 or args.probes < 1 or args.probes > args.count // len(KINDS):
         raise SystemExit("invalid corpus or probe count")
     if output.exists() and any(output.iterdir()):
         raise SystemExit(f"output directory is not empty: {output}")
     output.mkdir(parents=True, exist_ok=True)
     started_at = datetime.now(timezone.utc).isoformat()
-    work = Path(tempfile.mkdtemp(prefix="notyet-stress-"))
+    work = Path(tempfile.mkdtemp(prefix="wmw-stress-"))
     try:
         _, version = initialize(work, binary, args.count)
         probes, negatives = event_probes(binary, work, args.count, args.probes, output)
@@ -341,7 +341,7 @@ def main():
             "completed_at": datetime.now(timezone.utc).isoformat(),
             "platform": platform.platform(),
             "corpus_size": args.count,
-            "notyet": {
+            "wmw": {
                 "version": version,
                 "sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
             },

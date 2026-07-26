@@ -19,7 +19,7 @@ fn execute(arguments: Vec<String>) -> Result<(), String> {
         return Err("usage: cargo xtask verify".into());
     }
     let root = repository_root()?;
-    println!("Not Yet repository verification");
+    println!("Wake Me When repository verification");
     run(&root, "cargo", &["fmt", "--all", "--", "--check"])?;
     run(
         &root,
@@ -35,7 +35,7 @@ fn execute(arguments: Vec<String>) -> Result<(), String> {
         &[
             "llvm-cov",
             "--package",
-            "not-yet",
+            "wake-me-when",
             "--all-features",
             "--locked",
             "--ignore-filename-regex",

@@ -1,9 +1,9 @@
 [package]
-name = "not-yet"
-version = "0.1.0"
+name = "wake-me-when"
+version = "0.2.0"
 edition = "2024"
 description = "Repository-local prospective memory for coding agents"
-repository = "https://github.com/lucasrgt/not-yet"
+repository = "https://github.com/lucasrgt/wake-me-when"
 license = "MIT"
 readme = "README.md"
 
@@ -12,10 +12,10 @@ members = ["xtask"]
 resolver = "3"
 
 [lib]
-name = "notyet"
+name = "wmw"
 
 [[bin]]
-name = "notyet"
+name = "wmw"
 path = "src/main.rs"
 
 [dependencies]

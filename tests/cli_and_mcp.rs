@@ -1,13 +1,13 @@
 mod common;
 
 use common::*;
-use notyet::CueKind;
 use serde_json::{Value, json};
 use std::{
     ffi::OsString,
     io::{self, Cursor, Write},
     process::Command,
 };
+use wmw::CueKind;
 
 struct FailWriter;
 
@@ -25,16 +25,16 @@ fn os_args(values: &[&str]) -> Vec<OsString> {
 }
 
 fn cli(root: &std::path::Path, args: &[&str]) -> anyhow::Result<(i32, String)> {
-    let mut arguments = vec!["notyet"];
+    let mut arguments = vec!["wmw"];
     arguments.extend_from_slice(args);
     let mut output = Vec::new();
-    let code = notyet::run_cli_at(os_args(&arguments), root, &mut Cursor::new(""), &mut output)?;
+    let code = wmw::run_cli_at(os_args(&arguments), root, &mut Cursor::new(""), &mut output)?;
     Ok((code, String::from_utf8(output).unwrap()))
 }
 
 #[test]
 fn cli_covers_init_collect_wake_resolve_check_and_entrypoint() {
-    assert!(notyet::run_cli_env().is_err());
+    assert!(wmw::run_cli_env().is_err());
     let temp = repo();
     assert!(
         cli(temp.path(), &["init", "--agent-file", "CLAUDE.md"])
@@ -95,7 +95,7 @@ fn cli_covers_init_collect_wake_resolve_check_and_entrypoint() {
         cli(temp.path(), &["wake", "--event", "mobile-v1-retired"])
             .unwrap()
             .1
-            .contains("became NOW")
+            .contains("> WOKE:")
     );
     assert!(
         cli(temp.path(), &["resolve", "--id", id, "--evidence", "completed"])
@@ -110,23 +110,23 @@ fn cli_covers_init_collect_wake_resolve_check_and_entrypoint() {
     let mut binary = std::env::current_exe().unwrap();
     binary.pop();
     binary.pop();
-    binary.push(if cfg!(windows) { "notyet.exe" } else { "notyet" });
+    binary.push(if cfg!(windows) { "wmw.exe" } else { "wmw" });
     let version = Command::new(binary).arg("--version").output().unwrap();
     assert!(version.status.success());
     assert_eq!(
         String::from_utf8(version.stdout).unwrap().trim(),
-        format!("notyet {}", env!("CARGO_PKG_VERSION"))
+        format!("wmw {}", env!("CARGO_PKG_VERSION"))
     );
 }
 
 #[test]
 fn cli_and_mcp_propagate_protocol_and_output_failures() {
     let temp = initialized();
-    assert!(notyet::run_cli_at(os_args(&["notyet", "wake"]), temp.path(), &mut Cursor::new(""), &mut FailWriter).is_err());
-    assert!(notyet::run_cli_at(os_args(&["notyet", "--help"]), temp.path(), &mut Cursor::new(""), &mut Vec::new()).is_ok());
-    assert!(notyet::mcp_stream(&mut Cursor::new("not json\n"), &mut Vec::new()).is_err());
+    assert!(wmw::run_cli_at(os_args(&["wmw", "wake"]), temp.path(), &mut Cursor::new(""), &mut FailWriter).is_err());
+    assert!(wmw::run_cli_at(os_args(&["wmw", "--help"]), temp.path(), &mut Cursor::new(""), &mut Vec::new()).is_ok());
+    assert!(wmw::mcp_stream(&mut Cursor::new("not json\n"), &mut Vec::new()).is_err());
     assert!(
-        notyet::mcp_stream(
+        wmw::mcp_stream(
             &mut Cursor::new("{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\"}\n"),
             &mut FailWriter
         )
@@ -145,12 +145,12 @@ fn mcp_exposes_every_operation_through_the_shared_core() {
         json!({"jsonrpc":"2.0","method":"notifications/initialized","params":{}}),
         json!({"jsonrpc":"2.0","id":2,"method":"ping","params":{}}),
         json!({"jsonrpc":"2.0","id":3,"method":"tools/list","params":{}}),
-        json!({"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"notyet_collect","arguments":{"repository":repository,"task":"Migrate customer writes","plan":"mobile v1 still reads LegacyName","final_message":"customer.LegacyName = input.Name"}}}),
-        json!({"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"notyet_wake","arguments":{"repository":repository,"events":["mobile-v1-retired"]}}}),
-        json!({"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"notyet_check","arguments":{"repository":repository,"events":[]}}}),
+        json!({"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"wmw_collect","arguments":{"repository":repository,"task":"Migrate customer writes","plan":"mobile v1 still reads LegacyName","final_message":"customer.LegacyName = input.Name"}}}),
+        json!({"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"wmw_wake","arguments":{"repository":repository,"events":["mobile-v1-retired"]}}}),
+        json!({"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"wmw_check","arguments":{"repository":repository,"events":[]}}}),
         json!({"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"unknown","arguments":{"repository":repository}}}),
         json!({"jsonrpc":"2.0","id":8,"method":"unknown","params":{}}),
-        json!({"jsonrpc":"2.0","id":9,"method":"tools/call","params":{"name":"notyet_resolve","arguments":{"repository":repository,"id":"missing"}}}),
+        json!({"jsonrpc":"2.0","id":9,"method":"tools/call","params":{"name":"wmw_resolve","arguments":{"repository":repository,"id":"missing"}}}),
     ];
     let input = requests
         .iter()
@@ -158,14 +158,14 @@ fn mcp_exposes_every_operation_through_the_shared_core() {
         .collect::<Vec<_>>()
         .join("\n");
     let mut output = Vec::new();
-    notyet::mcp_stream(&mut Cursor::new(input), &mut output).unwrap();
+    wmw::mcp_stream(&mut Cursor::new(input), &mut output).unwrap();
     let responses = String::from_utf8(output)
         .unwrap()
         .lines()
         .map(|line| serde_json::from_str::<Value>(line).unwrap())
         .collect::<Vec<_>>();
     assert_eq!(responses.len(), 9);
-    assert_eq!(responses[0]["result"]["serverInfo"]["name"], "not-yet");
+    assert_eq!(responses[0]["result"]["serverInfo"]["name"], "wake-me-when");
     assert_eq!(responses[2]["result"]["tools"].as_array().unwrap().len(), 4);
     assert_eq!(responses[3]["result"]["structuredContent"]["recorded"].as_array().unwrap().len(), 1);
     assert_eq!(responses[4]["result"]["structuredContent"]["due"].as_array().unwrap().len(), 1);
@@ -176,8 +176,8 @@ fn mcp_exposes_every_operation_through_the_shared_core() {
     let request = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\",\"params\":{}}\n";
     let mut cli_output = Vec::new();
     assert_eq!(
-        notyet::run_cli_at(os_args(&["notyet", "mcp"]), temp.path(), &mut Cursor::new(request), &mut cli_output).unwrap(),
+        wmw::run_cli_at(os_args(&["wmw", "mcp"]), temp.path(), &mut Cursor::new(request), &mut cli_output).unwrap(),
         0
     );
-    assert!(String::from_utf8(cli_output).unwrap().contains("notyet_collect"));
+    assert!(String::from_utf8(cli_output).unwrap().contains("wmw_collect"));
 }

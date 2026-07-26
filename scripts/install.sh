@@ -9,11 +9,11 @@ case "$(uname -s)-$(uname -m)" in
   *) echo "Unsupported platform: $(uname -s)-$(uname -m)" >&2; exit 1 ;;
 esac
 
-destination="${NOTYET_INSTALL_DIR:-$HOME/.local/bin}"
-archive="${TMPDIR:-/tmp}/notyet-$target.zip"
+destination="${WMW_INSTALL_DIR:-$HOME/.local/bin}"
+archive="${TMPDIR:-/tmp}/wmw-$target.zip"
 mkdir -p "$destination"
-curl -fsSL "https://github.com/lucasrgt/not-yet/releases/latest/download/notyet-$target.zip" -o "$archive"
-unzip -jo "$archive" "*/notyet" -d "$destination"
-chmod +x "$destination/notyet"
+curl -fsSL "https://github.com/lucasrgt/wake-me-when/releases/latest/download/wmw-$target.zip" -o "$archive"
+unzip -jo "$archive" "*/wmw" -d "$destination"
+chmod +x "$destination/wmw"
 rm -f "$archive"
-echo "Installed notyet to $destination/notyet"
+echo "Installed wmw to $destination/wmw"

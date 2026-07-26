@@ -63,9 +63,9 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          binary="$PWD/target/${{ matrix.target }}/release/notyet"
-          docker run --rm --volume "$binary:/usr/local/bin/notyet:ro" \
-            debian:bookworm-slim /usr/local/bin/notyet --version
+          binary="$PWD/target/${{ matrix.target }}/release/wmw"
+          docker run --rm --volume "$binary:/usr/local/bin/wmw:ro" \
+            debian:bookworm-slim /usr/local/bin/wmw --version
       - name: Build native release binary
         if: runner.os != 'Linux'
         run: cargo build --release --locked --target ${{ matrix.target }}
