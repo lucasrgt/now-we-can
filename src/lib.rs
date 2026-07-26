@@ -92,11 +92,18 @@ pub fn collect(root: &Path, request: CollectRequest) -> Result<CollectResult> {
     let diff = diff(&root, &request.base)?;
     let envelope = json!({"task":request.task,"plan":request.plan,"final_message":request.final_message,"diff":diff});
     let evidence = serde_json::to_string(&envelope)?;
+    let literal = format!(
+        "{}\n{}\n{}\n{}",
+        request.task,
+        request.plan,
+        request.final_message,
+        envelope["diff"].as_str().unwrap_or_default()
+    );
     if evidence.len() > 120_000 {
         bail!("collection envelope exceeds 120000 bytes")
     }
-    let first = validated(judge(&root, &collect_prompt(&evidence, None)?)?.deferments, &evidence)?;
-    let second = validated(judge(&root, &collect_prompt(&evidence, Some(&first))?)?.deferments, &evidence)?;
+    let first = validated(judge(&root, &collect_prompt(&evidence, None)?)?.deferments, &literal)?;
+    let second = validated(judge(&root, &collect_prompt(&evidence, Some(&first))?)?.deferments, &literal)?;
     let confirmed = first.into_iter().filter(|item| second.contains(item)).collect::<Vec<_>>();
     let existing = load(&root)?;
     let mut recorded = Vec::new();

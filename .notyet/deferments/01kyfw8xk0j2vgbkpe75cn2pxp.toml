@@ -1,0 +1,18 @@
+schema = 1
+id = "01kyfw8xk0j2vgbkpe75cn2pxp"
+title = "Rerun Claude genesis validation"
+action = "rerun the frozen genesis cases with Claude and publish the paired provider comparison."
+blocker = "the local Claude CLI reports that its OAuth session expired and cannot refresh non-interactively."
+scopes = ["genesis/**"]
+evidence = [
+    "Action: rerun the frozen genesis cases with Claude and publish the paired provider comparison.",
+    "Current blocker: the local Claude CLI reports that its OAuth session expired and cannot refresh non-interactively.",
+]
+recorded_at = "2026-07-26T18:51:20.544748200Z"
+recorded_by = "Lucas Tinoco"
+recorded_commit = "820a0a02d3d19e24317ea21b46dfc0c8ae4fa3bf"
+
+[cue]
+kind = "event"
+path = ""
+value = "claude-auth-restored"

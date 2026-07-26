@@ -31,9 +31,12 @@ fn init_installs_assets_idempotently_and_confines_paths() {
 fn collect_requires_two_identical_evidence_bounded_passes_and_deduplicates() {
     let temp = initialized();
     change(temp.path());
-    let expected = candidate(CueKind::Event, "", "mobile-v1-retired", "event");
+    let mut expected = candidate(CueKind::Event, "", "mobile-v1-retired", "event");
+    expected.evidence[0] = "The dual-write remains\nuntil the named cue.".into();
     configure(temp.path(), std::slice::from_ref(&expected), "accept");
-    let result = notyet::collect(temp.path(), request()).unwrap();
+    let mut input = request();
+    input.final_message = "The dual-write remains\nuntil the named cue.".into();
+    let result = notyet::collect(temp.path(), input.clone()).unwrap();
     assert_eq!(result.candidates_found, 1);
     assert_eq!(result.recorded.len(), 1);
     assert_eq!(result.recorded[0].cue.value, "mobile-v1-retired");
@@ -44,7 +47,7 @@ fn collect_requires_two_identical_evidence_bounded_passes_and_deduplicates() {
             .is_file()
     );
 
-    let duplicate = notyet::collect(temp.path(), request()).unwrap();
+    let duplicate = notyet::collect(temp.path(), input).unwrap();
     assert_eq!(duplicate.duplicates, 1);
     assert!(duplicate.recorded.is_empty());
 
