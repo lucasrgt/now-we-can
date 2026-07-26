@@ -1,0 +1,4 @@
+schema = 1
+
+[judge]
+command = ["codex", "exec", "--ignore-rules", "--skip-git-repo-check", "--sandbox", "read-only", "-"]

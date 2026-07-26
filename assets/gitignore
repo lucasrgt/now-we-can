@@ -1,0 +1,6 @@
+
+# Not Yet local configuration and disposable state
+.notyet/config.local.toml
+.notyet/index.sqlite
+.notyet/index.sqlite-shm
+.notyet/index.sqlite-wal
