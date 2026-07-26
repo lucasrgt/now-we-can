@@ -1,0 +1,32 @@
+[
+  {
+    "case": "backend-dual-write",
+    "domain": "backend",
+    "deferment": "Remove a compatibility dual-write after its old client retires.",
+    "source": "https://martinfowler.com/articles/evodb.html"
+  },
+  {
+    "case": "frontend-contract-fallback",
+    "domain": "frontend",
+    "deferment": "Remove a legacy field fallback after the generated type drops it.",
+    "source": "https://www.typescriptlang.org/docs/handbook/2/everyday-types.html"
+  },
+  {
+    "case": "ui-warning-token",
+    "domain": "ui",
+    "deferment": "Replace a temporary literal after a semantic token ships.",
+    "source": "https://www.w3.org/WAI/ARIA/apg/practices/names-and-descriptions/"
+  },
+  {
+    "case": "roadmap-pagination",
+    "domain": "roadmap",
+    "deferment": "Start a dependent phase after its acceptance event passes.",
+    "source": "https://www.rfc-editor.org/rfc/rfc9110"
+  },
+  {
+    "case": "retired-feature-flag",
+    "domain": "frontend",
+    "deferment": "Remove an old branch after its controlling flag disappears.",
+    "source": "https://martinfowler.com/articles/feature-toggles.html"
+  }
+]

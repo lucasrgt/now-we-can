@@ -1,0 +1,37 @@
+diff --git a/.notyet/deferments/benchmark-retired-feature-flag.toml b/.notyet/deferments/benchmark-retired-feature-flag.toml
+index f8aa2c2..6c14fc8 100644
+--- a/.notyet/deferments/benchmark-retired-feature-flag.toml
++++ b/.notyet/deferments/benchmark-retired-feature-flag.toml
+@@ -4,10 +4,15 @@ title = "Remove the legacy checkout branch and render NewCheckout directly."
+ action = "Remove the legacy checkout branch and render NewCheckout directly."
+ blocker = "The legacy checkout flag still existed."
+ scopes = ["src/**"]
+-evidence = ["Remove the legacy checkout branch and render NewCheckout directly.", "The legacy checkout flag still existed."]
++evidence = [
++    "Remove the legacy checkout branch and render NewCheckout directly.",
++    "The legacy checkout flag still existed.",
++]
+ recorded_at = "2026-01-01T00:00:00Z"
+ recorded_by = "Not Yet benchmark fixture"
+ recorded_commit = "bfc05c2ead4e84514d1bd5930156be3dd3ede2da"
++resolved_at = "2026-07-26T19:10:58.851762552Z"
++resolution_evidence = "Updated src/Checkout.tsx to remove legacy branch, render <NewCheckout/> directly, and call track('checkout_opened') at start of Checkout()"
+ 
+ [cue]
+ kind = "path_absent"
+diff --git a/src/Checkout.tsx b/src/Checkout.tsx
+index 1f1bc7f..c52d8d6 100644
+--- a/src/Checkout.tsx
++++ b/src/Checkout.tsx
+@@ -1,9 +1,7 @@
+-import { LegacyCheckout } from "./LegacyCheckout";
+ import { NewCheckout } from "./NewCheckout";
+ import { track } from "./analytics";
+ 
+-const legacyFlag = false;
+-
+ export function Checkout() {
+-  return legacyFlag ? <LegacyCheckout /> : <NewCheckout />;
++  track("checkout_opened");
++  return <NewCheckout />;
+ }

@@ -1,0 +1,29 @@
+{
+  "active": 1,
+  "due": [
+    {
+      "schema": 1,
+      "id": "benchmark-backend-dual-write",
+      "title": "Remove the legacy_name dual-write from customer saves.",
+      "action": "Remove the legacy_name dual-write from customer saves.",
+      "blocker": "Mobile v1 still depended on legacy_name.",
+      "cue": {
+        "kind": "event",
+        "path": "",
+        "value": "mobile-v1-retired"
+      },
+      "scopes": [
+        "src/customer.py"
+      ],
+      "evidence": [
+        "Remove the legacy_name dual-write from customer saves.",
+        "Mobile v1 still depended on legacy_name."
+      ],
+      "recorded_at": "2026-01-01T00:00:00Z",
+      "recorded_by": "Not Yet benchmark fixture",
+      "recorded_commit": "cc6f846f241509f74365f1bfe23db9561cb6c053",
+      "resolved_at": null,
+      "resolution_evidence": null
+    }
+  ]
+}

@@ -1,0 +1,497 @@
+{
+  "first_exit": 0,
+  "first": {
+    "candidates_found": 20,
+    "duplicates": 0,
+    "recorded": [
+      {
+        "schema": 1,
+        "id": "01kyfxgsyxr4a7f5ak7c5na6en",
+        "title": "Remove stress compatibility 00",
+        "action": "Remove temporary stress mechanism 00",
+        "blocker": "Stress prerequisite 00 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-00"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:07.549839600Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgt0nqsvay7h2e85pyzzs",
+        "title": "Remove stress compatibility 01",
+        "action": "Remove temporary stress mechanism 01",
+        "blocker": "Stress prerequisite 01 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-01"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:07.605674100Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgt2ajny9aje3ngwtqth1",
+        "title": "Remove stress compatibility 02",
+        "action": "Remove temporary stress mechanism 02",
+        "blocker": "Stress prerequisite 02 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-02"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:07.658240600Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgt40gvc97d3rdqww7cmq",
+        "title": "Remove stress compatibility 03",
+        "action": "Remove temporary stress mechanism 03",
+        "blocker": "Stress prerequisite 03 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-03"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:07.712106700Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgt5mpc0avwkgg71t7v7c",
+        "title": "Remove stress compatibility 04",
+        "action": "Remove temporary stress mechanism 04",
+        "blocker": "Stress prerequisite 04 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-04"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:07.764694400Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgt7cqsz45wp54dpck94c",
+        "title": "Remove stress compatibility 05",
+        "action": "Remove temporary stress mechanism 05",
+        "blocker": "Stress prerequisite 05 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-05"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:07.820266400Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgt92fnnv4mpxj90y0ksv",
+        "title": "Remove stress compatibility 06",
+        "action": "Remove temporary stress mechanism 06",
+        "blocker": "Stress prerequisite 06 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-06"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:07.874310500Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtas2ezs6bsj4k02kvbn",
+        "title": "Remove stress compatibility 07",
+        "action": "Remove temporary stress mechanism 07",
+        "blocker": "Stress prerequisite 07 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-07"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:07.929538100Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtcn6qx0xvn62z33d1zf",
+        "title": "Remove stress compatibility 08",
+        "action": "Remove temporary stress mechanism 08",
+        "blocker": "Stress prerequisite 08 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-08"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:07.989251800Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtebm9dv965qtx1p6szf",
+        "title": "Remove stress compatibility 09",
+        "action": "Remove temporary stress mechanism 09",
+        "blocker": "Stress prerequisite 09 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-09"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:08.043095800Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtg29y9c1qbkp7kwq5c3",
+        "title": "Remove stress compatibility 10",
+        "action": "Remove temporary stress mechanism 10",
+        "blocker": "Stress prerequisite 10 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-10"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:08.098147600Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgthpyb1rfwt2tnbw3mxs",
+        "title": "Remove stress compatibility 11",
+        "action": "Remove temporary stress mechanism 11",
+        "blocker": "Stress prerequisite 11 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-11"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:08.150759300Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtkc0y1a2ketz0p8bwnc",
+        "title": "Remove stress compatibility 12",
+        "action": "Remove temporary stress mechanism 12",
+        "blocker": "Stress prerequisite 12 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-12"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:08.204861400Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtn14ms8prwmc81pxns8",
+        "title": "Remove stress compatibility 13",
+        "action": "Remove temporary stress mechanism 13",
+        "blocker": "Stress prerequisite 13 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-13"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:08.257630700Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtprtxa1v71tjh3r24s2",
+        "title": "Remove stress compatibility 14",
+        "action": "Remove temporary stress mechanism 14",
+        "blocker": "Stress prerequisite 14 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-14"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:08.312793500Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtrkh21fy12nasqg3ttt",
+        "title": "Remove stress compatibility 15",
+        "action": "Remove temporary stress mechanism 15",
+        "blocker": "Stress prerequisite 15 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-15"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:08.371012Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtt83mtz0fbfsp3d922x",
+        "title": "Remove stress compatibility 16",
+        "action": "Remove temporary stress mechanism 16",
+        "blocker": "Stress prerequisite 16 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-16"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:08.424719100Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtw2edayyjx1fr8a7ckg",
+        "title": "Remove stress compatibility 17",
+        "action": "Remove temporary stress mechanism 17",
+        "blocker": "Stress prerequisite 17 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-17"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:08.482744500Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtxqpk230frckdbhgpmd",
+        "title": "Remove stress compatibility 18",
+        "action": "Remove temporary stress mechanism 18",
+        "blocker": "Stress prerequisite 18 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-18"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:08.535360500Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      },
+      {
+        "schema": 1,
+        "id": "01kyfxgtzbm5z75khkpzngrzkb",
+        "title": "Remove stress compatibility 19",
+        "action": "Remove temporary stress mechanism 19",
+        "blocker": "Stress prerequisite 19 is false",
+        "cue": {
+          "kind": "event",
+          "path": "",
+          "value": "collect-ready-19"
+        },
+        "scopes": [
+          "src/**"
+        ],
+        "evidence": [
+          "Complete the stress fixture migration",
+          "temporary compatibility remains"
+        ],
+        "recorded_at": "2026-07-26T19:13:08.587843400Z",
+        "recorded_by": "Not Yet Benchmark",
+        "recorded_commit": "42e228c712a0db549de7baa0bcf28e7dfdb91292",
+        "resolved_at": null,
+        "resolution_evidence": null
+      }
+    ]
+  },
+  "duplicate_exit": 0,
+  "duplicate": {
+    "candidates_found": 20,
+    "duplicates": 20,
+    "recorded": []
+  },
+  "overflow_exit": 2,
+  "overflow_stderr": "judge returned too many deferments"
+}

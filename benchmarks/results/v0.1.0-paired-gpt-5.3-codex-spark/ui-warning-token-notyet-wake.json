@@ -1,0 +1,29 @@
+{
+  "active": 1,
+  "due": [
+    {
+      "schema": 1,
+      "id": "benchmark-ui-warning-token",
+      "title": "Replace the temporary warning color with the shipped warningColor token.",
+      "action": "Replace the temporary warning color with the shipped warningColor token.",
+      "blocker": "The design-system warning token had not shipped.",
+      "cue": {
+        "kind": "file_contains",
+        "path": "src/theme.ts",
+        "value": "color.status.warning"
+      },
+      "scopes": [
+        "src/**"
+      ],
+      "evidence": [
+        "Replace the temporary warning color with the shipped warningColor token.",
+        "The design-system warning token had not shipped."
+      ],
+      "recorded_at": "2026-01-01T00:00:00Z",
+      "recorded_by": "Not Yet benchmark fixture",
+      "recorded_commit": "36295e784c64445c404629a4255145dd4488465c",
+      "resolved_at": null,
+      "resolution_evidence": null
+    }
+  ]
+}

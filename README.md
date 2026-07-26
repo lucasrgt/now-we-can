@@ -167,6 +167,18 @@ if observable_cue_is_true:
     deliver_evidence_backed_deferment
 ```
 
+## Benchmarks
+
+The published v0.1.0 suite keeps capture, delivery, and scale separate:
+
+- the paired agent run turned 5/5 observed baseline misses into passing Not Yet
+  arms, with every wake, resolve, and check evidenced;
+- the 1,024- and 10,000-deferment stress runs recovered every target, exercised
+  all five cue kinds, and passed corruption and collection-bound checks.
+
+Raw events, diffs, summaries, limitations, and reproduction commands live in
+[`benchmarks/`](benchmarks/).
+
 ## Build
 
 ```bash

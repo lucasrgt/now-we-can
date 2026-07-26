@@ -1,0 +1,36 @@
+diff --git a/.notyet/deferments/benchmark-frontend-contract-fallback.toml b/.notyet/deferments/benchmark-frontend-contract-fallback.toml
+index fe4384b..d6dd690 100644
+--- a/.notyet/deferments/benchmark-frontend-contract-fallback.toml
++++ b/.notyet/deferments/benchmark-frontend-contract-fallback.toml
+@@ -4,10 +4,15 @@ title = "Remove the optional legacy name fallback and LegacyUser type."
+ action = "Remove the optional legacy name fallback and LegacyUser type."
+ blocker = "The generated User contract still exposed name."
+ scopes = ["src/**"]
+-evidence = ["Remove the optional legacy name fallback and LegacyUser type.", "The generated User contract still exposed name."]
++evidence = [
++    "Remove the optional legacy name fallback and LegacyUser type.",
++    "The generated User contract still exposed name.",
++]
+ recorded_at = "2026-01-01T00:00:00Z"
+ recorded_by = "Not Yet benchmark fixture"
+ recorded_commit = "9096ca88fd7b47a32cc6ed01e5d82c3fe649ff95"
++resolved_at = "2026-07-26T19:09:49.029579235Z"
++resolution_evidence = "Updated src/UserCard.tsx to remove LegacyUser and name fallback and use user.displayName as img alt text."
+ 
+ [cue]
+ kind = "file_not_contains"
+diff --git a/src/UserCard.tsx b/src/UserCard.tsx
+index bf0e132..414669a 100644
+--- a/src/UserCard.tsx
++++ b/src/UserCard.tsx
+@@ -1,8 +1,5 @@
+ import type { User } from "./generated/User";
+ 
+-type LegacyUser = User & { name?: string };
+-
+-export function UserCard({ user }: { user: LegacyUser }) {
+-  const label = user.displayName ?? user.name ?? "Unknown";
+-  return <img src={user.avatarUrl} />;
++export function UserCard({ user }: { user: User }) {
++  return <img src={user.avatarUrl} alt={user.displayName} />;
+ }

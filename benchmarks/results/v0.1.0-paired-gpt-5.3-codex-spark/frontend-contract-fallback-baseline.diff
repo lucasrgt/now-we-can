@@ -1,0 +1,12 @@
+diff --git a/src/UserCard.tsx b/src/UserCard.tsx
+index bf0e132..dc8502b 100644
+--- a/src/UserCard.tsx
++++ b/src/UserCard.tsx
+@@ -3,6 +3,5 @@ import type { User } from "./generated/User";
+ type LegacyUser = User & { name?: string };
+ 
+ export function UserCard({ user }: { user: LegacyUser }) {
+-  const label = user.displayName ?? user.name ?? "Unknown";
+-  return <img src={user.avatarUrl} />;
++  return <img src={user.avatarUrl} alt={user.displayName} />;
+ }

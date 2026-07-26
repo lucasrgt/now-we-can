@@ -1,0 +1,11 @@
+diff --git a/src/Checkout.tsx b/src/Checkout.tsx
+index 1f1bc7f..28119fc 100644
+--- a/src/Checkout.tsx
++++ b/src/Checkout.tsx
+@@ -5,5 +5,6 @@ import { track } from "./analytics";
+ const legacyFlag = false;
+ 
+ export function Checkout() {
++  track("checkout_opened");
+   return legacyFlag ? <LegacyCheckout /> : <NewCheckout />;
+ }

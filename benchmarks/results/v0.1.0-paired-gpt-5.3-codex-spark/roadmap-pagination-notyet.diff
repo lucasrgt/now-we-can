@@ -1,0 +1,35 @@
+diff --git a/.notyet/deferments/benchmark-roadmap-pagination.toml b/.notyet/deferments/benchmark-roadmap-pagination.toml
+index 09482a8..510d16e 100644
+--- a/.notyet/deferments/benchmark-roadmap-pagination.toml
++++ b/.notyet/deferments/benchmark-roadmap-pagination.toml
+@@ -4,10 +4,15 @@ title = "Accept a page argument and pass its offset to fetch_orders."
+ action = "Accept a page argument and pass its offset to fetch_orders."
+ blocker = "The list-orders AVP had not passed."
+ scopes = ["src/orders.py"]
+-evidence = ["Accept a page argument and pass its offset to fetch_orders.", "The list-orders AVP had not passed."]
++evidence = [
++    "Accept a page argument and pass its offset to fetch_orders.",
++    "The list-orders AVP had not passed.",
++]
+ recorded_at = "2026-01-01T00:00:00Z"
+ recorded_by = "Not Yet benchmark fixture"
+ recorded_commit = "f2a98dd00c45e2c43937b04eb993fbcc4b9ba2e0"
++resolved_at = "2026-07-26T19:11:21.426212030Z"
++resolution_evidence = "Updated src/orders.py:list_orders now accepts page, computes offset, passes it as offset to db.fetch_orders(limit=20, offset=...), and returns {'items': items, 'total': db.count_orders()}."
+ 
+ [cue]
+ kind = "event"
+diff --git a/src/orders.py b/src/orders.py
+index 0f95717..eb48e09 100644
+--- a/src/orders.py
++++ b/src/orders.py
+@@ -1,3 +1,6 @@
+-def list_orders(db):
+-    items = db.fetch_orders(limit=20)
+-    return {"items": items}
++def list_orders(db, page=1):
++    limit = 20
++    offset = max(page - 1, 0) * limit
++    items = db.fetch_orders(limit=limit, offset=offset)
++    total = db.count_orders()
++    return {"items": items, "total": total}

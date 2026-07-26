@@ -1,0 +1,11 @@
+diff --git a/src/customer.py b/src/customer.py
+index f6a0633..e8a857c 100644
+--- a/src/customer.py
++++ b/src/customer.py
+@@ -1,5 +1,5 @@
+ def save_customer(customer, display_name, email):
+     customer["display_name"] = display_name
+     customer["legacy_name"] = display_name  # mobile v1 compatibility
+-    customer["email"] = email
++    customer["email"] = email.lower()
+     return customer

@@ -1,0 +1,6 @@
+{
+  "sleeping_check_exit": 0,
+  "due_check_exit": 1,
+  "corrupt_store_exit": 2,
+  "corrupt_store_stderr": "invalid deferment \\\\?\\C:\\Users\\lucas\\AppData\\Local\\Temp\\notyet-stress-nq93gcp8\\.notyet\\deferments\\corrupt.toml: TOML parse error at line 1, column 13\n  |\n1 | not = [valid\n  |             ^\nunclosed array, expected `]`"
+}

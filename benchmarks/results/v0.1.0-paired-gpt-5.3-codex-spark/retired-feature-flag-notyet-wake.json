@@ -1,0 +1,29 @@
+{
+  "active": 1,
+  "due": [
+    {
+      "schema": 1,
+      "id": "benchmark-retired-feature-flag",
+      "title": "Remove the legacy checkout branch and render NewCheckout directly.",
+      "action": "Remove the legacy checkout branch and render NewCheckout directly.",
+      "blocker": "The legacy checkout flag still existed.",
+      "cue": {
+        "kind": "path_absent",
+        "path": "flags/legacy-checkout.flag",
+        "value": ""
+      },
+      "scopes": [
+        "src/**"
+      ],
+      "evidence": [
+        "Remove the legacy checkout branch and render NewCheckout directly.",
+        "The legacy checkout flag still existed."
+      ],
+      "recorded_at": "2026-01-01T00:00:00Z",
+      "recorded_by": "Not Yet benchmark fixture",
+      "recorded_commit": "bfc05c2ead4e84514d1bd5930156be3dd3ede2da",
+      "resolved_at": null,
+      "resolution_evidence": null
+    }
+  ]
+}

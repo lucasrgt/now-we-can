@@ -1,0 +1,29 @@
+{
+  "active": 1,
+  "due": [
+    {
+      "schema": 1,
+      "id": "benchmark-roadmap-pagination",
+      "title": "Accept a page argument and pass its offset to fetch_orders.",
+      "action": "Accept a page argument and pass its offset to fetch_orders.",
+      "blocker": "The list-orders AVP had not passed.",
+      "cue": {
+        "kind": "event",
+        "path": "",
+        "value": "avp:list-orders:passed"
+      },
+      "scopes": [
+        "src/orders.py"
+      ],
+      "evidence": [
+        "Accept a page argument and pass its offset to fetch_orders.",
+        "The list-orders AVP had not passed."
+      ],
+      "recorded_at": "2026-01-01T00:00:00Z",
+      "recorded_by": "Not Yet benchmark fixture",
+      "recorded_commit": "f2a98dd00c45e2c43937b04eb993fbcc4b9ba2e0",
+      "resolved_at": null,
+      "resolution_evidence": null
+    }
+  ]
+}

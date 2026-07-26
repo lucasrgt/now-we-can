@@ -1,0 +1,46 @@
+diff --git a/.notyet/deferments/benchmark-ui-warning-token.toml b/.notyet/deferments/benchmark-ui-warning-token.toml
+index b066764..7f9d35f 100644
+--- a/.notyet/deferments/benchmark-ui-warning-token.toml
++++ b/.notyet/deferments/benchmark-ui-warning-token.toml
+@@ -4,10 +4,15 @@ title = "Replace the temporary warning color with the shipped warningColor token
+ action = "Replace the temporary warning color with the shipped warningColor token."
+ blocker = "The design-system warning token had not shipped."
+ scopes = ["src/**"]
+-evidence = ["Replace the temporary warning color with the shipped warningColor token.", "The design-system warning token had not shipped."]
++evidence = [
++    "Replace the temporary warning color with the shipped warningColor token.",
++    "The design-system warning token had not shipped.",
++]
+ recorded_at = "2026-01-01T00:00:00Z"
+ recorded_by = "Not Yet benchmark fixture"
+ recorded_commit = "36295e784c64445c404629a4255145dd4488465c"
++resolved_at = "2026-07-26T19:11:47.945547539Z"
++resolution_evidence = "Replaced src/theme.ts temporary color.status.warning token with exported warningColor token using , and switched PendingPayment to consume warningColor."
+ 
+ [cue]
+ kind = "file_contains"
+diff --git a/src/PendingPayment.tsx b/src/PendingPayment.tsx
+index f1f5f3c..b461df9 100644
+--- a/src/PendingPayment.tsx
++++ b/src/PendingPayment.tsx
+@@ -1,3 +1,9 @@
++import { warningColor } from "./theme";
++
+ export function PendingPayment() {
+-  return <span style={{ color: "#D97706" }}>Payment pending</span>;
++  return (
++    <span role="status" aria-live="polite" style={{ color: warningColor }}>
++      Payment pending
++    </span>
++  );
+ }
+diff --git a/src/theme.ts b/src/theme.ts
+index 76cd458..4e274e6 100644
+--- a/src/theme.ts
++++ b/src/theme.ts
+@@ -1,4 +1 @@
+-export const color = {
+-  status: { warning: "#D97706" },
+-};
+-export const warningColor = color.status.warning;
++export const warningColor = "var(--warningColor)";

@@ -1,0 +1,29 @@
+{
+  "active": 1,
+  "due": [
+    {
+      "schema": 1,
+      "id": "benchmark-frontend-contract-fallback",
+      "title": "Remove the optional legacy name fallback and LegacyUser type.",
+      "action": "Remove the optional legacy name fallback and LegacyUser type.",
+      "blocker": "The generated User contract still exposed name.",
+      "cue": {
+        "kind": "file_not_contains",
+        "path": "src/generated/User.ts",
+        "value": "name:"
+      },
+      "scopes": [
+        "src/**"
+      ],
+      "evidence": [
+        "Remove the optional legacy name fallback and LegacyUser type.",
+        "The generated User contract still exposed name."
+      ],
+      "recorded_at": "2026-01-01T00:00:00Z",
+      "recorded_by": "Not Yet benchmark fixture",
+      "recorded_commit": "9096ca88fd7b47a32cc6ed01e5d82c3fe649ff95",
+      "resolved_at": null,
+      "resolution_evidence": null
+    }
+  ]
+}
