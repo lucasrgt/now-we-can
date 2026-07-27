@@ -1,13 +1,13 @@
 mod common;
 
 use common::*;
+use nwc::CueKind;
 use serde_json::{Value, json};
 use std::{
     ffi::OsString,
     io::{self, Cursor, Write},
     process::Command,
 };
-use wmw::CueKind;
 
 struct FailWriter;
 
@@ -25,16 +25,16 @@ fn os_args(values: &[&str]) -> Vec<OsString> {
 }
 
 fn cli(root: &std::path::Path, args: &[&str]) -> anyhow::Result<(i32, String)> {
-    let mut arguments = vec!["wmw"];
+    let mut arguments = vec!["nwc"];
     arguments.extend_from_slice(args);
     let mut output = Vec::new();
-    let code = wmw::run_cli_at(os_args(&arguments), root, &mut Cursor::new(""), &mut output)?;
+    let code = nwc::run_cli_at(os_args(&arguments), root, &mut Cursor::new(""), &mut output)?;
     Ok((code, String::from_utf8(output).unwrap()))
 }
 
 #[test]
 fn cli_covers_init_collect_wake_resolve_check_and_entrypoint() {
-    assert!(wmw::run_cli_env().is_err());
+    assert!(nwc::run_cli_env().is_err());
     let temp = repo();
     assert!(
         cli(temp.path(), &["init", "--agent-file", "CLAUDE.md"])
@@ -110,23 +110,23 @@ fn cli_covers_init_collect_wake_resolve_check_and_entrypoint() {
     let mut binary = std::env::current_exe().unwrap();
     binary.pop();
     binary.pop();
-    binary.push(if cfg!(windows) { "wmw.exe" } else { "wmw" });
+    binary.push(if cfg!(windows) { "nwc.exe" } else { "nwc" });
     let version = Command::new(binary).arg("--version").output().unwrap();
     assert!(version.status.success());
     assert_eq!(
         String::from_utf8(version.stdout).unwrap().trim(),
-        format!("wmw {}", env!("CARGO_PKG_VERSION"))
+        format!("nwc {}", env!("CARGO_PKG_VERSION"))
     );
 }
 
 #[test]
 fn cli_and_mcp_propagate_protocol_and_output_failures() {
     let temp = initialized();
-    assert!(wmw::run_cli_at(os_args(&["wmw", "wake"]), temp.path(), &mut Cursor::new(""), &mut FailWriter).is_err());
-    assert!(wmw::run_cli_at(os_args(&["wmw", "--help"]), temp.path(), &mut Cursor::new(""), &mut Vec::new()).is_ok());
-    assert!(wmw::mcp_stream(&mut Cursor::new("not json\n"), &mut Vec::new()).is_err());
+    assert!(nwc::run_cli_at(os_args(&["nwc", "wake"]), temp.path(), &mut Cursor::new(""), &mut FailWriter).is_err());
+    assert!(nwc::run_cli_at(os_args(&["nwc", "--help"]), temp.path(), &mut Cursor::new(""), &mut Vec::new()).is_ok());
+    assert!(nwc::mcp_stream(&mut Cursor::new("not json\n"), &mut Vec::new()).is_err());
     assert!(
-        wmw::mcp_stream(
+        nwc::mcp_stream(
             &mut Cursor::new("{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"initialize\"}\n"),
             &mut FailWriter
         )
@@ -145,12 +145,12 @@ fn mcp_exposes_every_operation_through_the_shared_core() {
         json!({"jsonrpc":"2.0","method":"notifications/initialized","params":{}}),
         json!({"jsonrpc":"2.0","id":2,"method":"ping","params":{}}),
         json!({"jsonrpc":"2.0","id":3,"method":"tools/list","params":{}}),
-        json!({"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"wmw_collect","arguments":{"repository":repository,"task":"Migrate customer writes","plan":"mobile v1 still reads LegacyName","final_message":"customer.LegacyName = input.Name"}}}),
-        json!({"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"wmw_wake","arguments":{"repository":repository,"events":["mobile-v1-retired"]}}}),
-        json!({"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"wmw_check","arguments":{"repository":repository,"events":[]}}}),
+        json!({"jsonrpc":"2.0","id":4,"method":"tools/call","params":{"name":"nwc_collect","arguments":{"repository":repository,"task":"Migrate customer writes","plan":"mobile v1 still reads LegacyName","final_message":"customer.LegacyName = input.Name"}}}),
+        json!({"jsonrpc":"2.0","id":5,"method":"tools/call","params":{"name":"nwc_wake","arguments":{"repository":repository,"events":["mobile-v1-retired"]}}}),
+        json!({"jsonrpc":"2.0","id":6,"method":"tools/call","params":{"name":"nwc_check","arguments":{"repository":repository,"events":[]}}}),
         json!({"jsonrpc":"2.0","id":7,"method":"tools/call","params":{"name":"unknown","arguments":{"repository":repository}}}),
         json!({"jsonrpc":"2.0","id":8,"method":"unknown","params":{}}),
-        json!({"jsonrpc":"2.0","id":9,"method":"tools/call","params":{"name":"wmw_resolve","arguments":{"repository":repository,"id":"missing"}}}),
+        json!({"jsonrpc":"2.0","id":9,"method":"tools/call","params":{"name":"nwc_resolve","arguments":{"repository":repository,"id":"missing"}}}),
     ];
     let input = requests
         .iter()
@@ -158,14 +158,14 @@ fn mcp_exposes_every_operation_through_the_shared_core() {
         .collect::<Vec<_>>()
         .join("\n");
     let mut output = Vec::new();
-    wmw::mcp_stream(&mut Cursor::new(input), &mut output).unwrap();
+    nwc::mcp_stream(&mut Cursor::new(input), &mut output).unwrap();
     let responses = String::from_utf8(output)
         .unwrap()
         .lines()
         .map(|line| serde_json::from_str::<Value>(line).unwrap())
         .collect::<Vec<_>>();
     assert_eq!(responses.len(), 9);
-    assert_eq!(responses[0]["result"]["serverInfo"]["name"], "wake-me-when");
+    assert_eq!(responses[0]["result"]["serverInfo"]["name"], "now-we-can");
     assert_eq!(responses[2]["result"]["tools"].as_array().unwrap().len(), 4);
     assert_eq!(responses[3]["result"]["structuredContent"]["recorded"].as_array().unwrap().len(), 1);
     assert_eq!(responses[4]["result"]["structuredContent"]["due"].as_array().unwrap().len(), 1);
@@ -176,8 +176,8 @@ fn mcp_exposes_every_operation_through_the_shared_core() {
     let request = "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"tools/list\",\"params\":{}}\n";
     let mut cli_output = Vec::new();
     assert_eq!(
-        wmw::run_cli_at(os_args(&["wmw", "mcp"]), temp.path(), &mut Cursor::new(request), &mut cli_output).unwrap(),
+        nwc::run_cli_at(os_args(&["nwc", "mcp"]), temp.path(), &mut Cursor::new(request), &mut cli_output).unwrap(),
         0
     );
-    assert!(String::from_utf8(cli_output).unwrap().contains("wmw_collect"));
+    assert!(String::from_utf8(cli_output).unwrap().contains("nwc_collect"));
 }

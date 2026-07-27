@@ -67,7 +67,7 @@ jobs:
         shell: pwsh
         run: |
           $packages = (cargo metadata --no-deps --format-version 1 | ConvertFrom-Json).packages
-          $version = ($packages | Where-Object name -eq "wake-me-when").version
+          $version = ($packages | Where-Object name -eq "now-we-can").version
           if ("v$version" -ne "${{ github.ref_name }}") {
             throw "Tag ${{ github.ref_name }} does not match package version $version"
           }
@@ -79,23 +79,23 @@ jobs:
         if: runner.os == 'Linux'
         shell: bash
         run: |
-          binary="$PWD/target/${{ matrix.target }}/release/wmw"
-          docker run --rm --volume "$binary:/usr/local/bin/wmw:ro" \
-            debian:bookworm-slim /usr/local/bin/wmw --version
+          binary="$PWD/target/${{ matrix.target }}/release/nwc"
+          docker run --rm --volume "$binary:/usr/local/bin/nwc:ro" \
+            debian:bookworm-slim /usr/local/bin/nwc --version
       - name: Build native release binary
         if: runner.os != 'Linux'
         run: cargo build --release --locked --target ${{ matrix.target }}
       - name: Package binary
         shell: pwsh
         run: |
-          $name = "wmw-${{ matrix.target }}"
+          $name = "nwc-${{ matrix.target }}"
           New-Item -ItemType Directory -Path "dist/$name" | Out-Null
-          Copy-Item "target/${{ matrix.target }}/release/wmw${{ matrix.suffix }}" "dist/$name/"
+          Copy-Item "target/${{ matrix.target }}/release/nwc${{ matrix.suffix }}" "dist/$name/"
           Copy-Item README.md, LICENSE "dist/$name/"
           Compress-Archive -Path "dist/$name" -DestinationPath "dist/$name.zip"
       - uses: actions/upload-artifact@v7
         with:
-          name: wmw-${{ matrix.target }}
+          name: nwc-${{ matrix.target }}
           path: dist/*.zip
           if-no-files-found: error
 
@@ -123,5 +123,5 @@ jobs:
             dist/*.zip \
             dist/SHA256SUMS \
             --verify-tag \
-            --title "Wake Me When ${GITHUB_REF_NAME}" \
+            --title "Now We Can ${GITHUB_REF_NAME}" \
             --generate-notes

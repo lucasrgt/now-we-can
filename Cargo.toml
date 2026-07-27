@@ -1,9 +1,9 @@
 [package]
-name = "wake-me-when"
-version = "0.2.3"
+name = "now-we-can"
+version = "0.3.0"
 edition = "2024"
 description = "Repository-local prospective memory for coding agents"
-repository = "https://github.com/lucasrgt/wake-me-when"
+repository = "https://github.com/lucasrgt/now-we-can"
 license = "MIT"
 readme = "README.md"
 
@@ -12,10 +12,10 @@ members = ["xtask"]
 resolver = "3"
 
 [lib]
-name = "wmw"
+name = "nwc"
 
 [[bin]]
-name = "wmw"
+name = "nwc"
 path = "src/main.rs"
 
 [dependencies]

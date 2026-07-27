@@ -1,4 +1,4 @@
-# Wake Me When genesis harness
+# Now We Can genesis harness
 
 This harness tests the product's first claim before the product exists:
 

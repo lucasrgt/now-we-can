@@ -1,9 +1,9 @@
 #![allow(dead_code)]
 
 use chrono::Utc;
+use nwc::{Candidate, Cue, CueKind, Deferment};
 use std::{fs, path::Path, process::Command};
 use tempfile::TempDir;
-use wmw::{Candidate, Cue, CueKind, Deferment};
 
 pub fn git(root: &Path, args: &[&str]) -> String {
     let output = Command::new("git").args(args).current_dir(root).output().unwrap();
@@ -26,9 +26,9 @@ pub fn repo() -> TempDir {
 
 pub fn initialized() -> TempDir {
     let temp = repo();
-    wmw::init(temp.path(), &[Path::new("AGENTS.md").into()]).unwrap();
+    nwc::init(temp.path(), &[Path::new("AGENTS.md").into()]).unwrap();
     git(temp.path(), &["add", "."]);
-    git(temp.path(), &["commit", "-m", "adopt wake me when"]);
+    git(temp.path(), &["commit", "-m", "adopt nwc"]);
     temp
 }
 
@@ -48,9 +48,9 @@ pub fn candidate(kind: CueKind, path: &str, value: &str, suffix: &str) -> Candid
 }
 
 pub fn configure(root: &Path, candidates: &[Candidate], mode: &str) {
-    let candidates_path = root.join(".wmw/judge-candidates.json");
+    let candidates_path = root.join(".nwc/judge-candidates.json");
     fs::write(&candidates_path, serde_json::to_string(candidates).unwrap()).unwrap();
-    let script = root.join(".wmw/judge.py");
+    let script = root.join(".nwc/judge.py");
     fs::write(
         &script,
         r#"import json,sys
@@ -73,14 +73,14 @@ print(json.dumps({"deferments":items}))
     ])
     .unwrap();
     fs::write(
-        root.join(".wmw/config.local.toml"),
+        root.join(".nwc/config.local.toml"),
         format!("schema = 1\n[judge]\ncommand = {command}\n"),
     )
     .unwrap();
 }
 
-pub fn request() -> wmw::CollectRequest {
-    wmw::CollectRequest {
+pub fn request() -> nwc::CollectRequest {
+    nwc::CollectRequest {
         task: "Migrate customer writes while mobile v1 remains active".into(),
         plan: "Keep compatibility because mobile v1 still reads LegacyName.".into(),
         final_message: "The dual-write remains until the named cue.".into(),
@@ -109,7 +109,7 @@ pub fn write_deferment(root: &Path, id: &str, cue: Cue) {
         resolution_evidence: None,
     };
     fs::write(
-        root.join(format!(".wmw/deferments/{id}.toml")),
+        root.join(format!(".nwc/deferments/{id}.toml")),
         toml::to_string_pretty(&item).unwrap(),
     )
     .unwrap();

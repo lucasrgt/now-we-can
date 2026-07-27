@@ -9,11 +9,11 @@ case "$(uname -s)-$(uname -m)" in
   *) echo "Unsupported platform: $(uname -s)-$(uname -m)" >&2; exit 1 ;;
 esac
 
-destination="${WMW_INSTALL_DIR:-$HOME/.local/bin}"
-archive="${TMPDIR:-/tmp}/wmw-$target.zip"
+destination="${NWC_INSTALL_DIR:-$HOME/.local/bin}"
+archive="${TMPDIR:-/tmp}/nwc-$target.zip"
 mkdir -p "$destination"
-curl -fsSL "https://github.com/lucasrgt/wake-me-when/releases/latest/download/wmw-$target.zip" -o "$archive"
-unzip -jo "$archive" "*/wmw" -d "$destination"
-chmod +x "$destination/wmw"
+curl -fsSL "https://github.com/lucasrgt/now-we-can/releases/latest/download/nwc-$target.zip" -o "$archive"
+unzip -jo "$archive" "*/nwc" -d "$destination"
+chmod +x "$destination/nwc"
 rm -f "$archive"
-echo "Installed wmw to $destination/wmw"
+echo "Installed nwc to $destination/nwc"

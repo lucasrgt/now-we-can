@@ -2,5 +2,5 @@
 **/__pycache__/
 *.pyc
 
-# Wake Me When local configuration and disposable state
-.wmw/config.local.toml
+# Now We Can local configuration and disposable state
+.nwc/config.local.toml

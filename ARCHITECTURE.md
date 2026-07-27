@@ -1,8 +1,8 @@
-# Wake Me When Architecture
+# Now We Can Architecture
 
 ## Purpose
 
-Wake Me When is repository-local prospective memory for coding agents. It converts
+Now We Can is repository-local prospective memory for coding agents. It converts
 conditional deferments found at task completion into versioned obligations and
 delivers them when a deterministic cue becomes true.
 
@@ -19,10 +19,10 @@ The system contains one durable concept:
 There are four operations:
 
 ```text
-Completed work is inspected -> wmw collect
-Context or an event arrives  -> wmw wake
-The action is completed      -> wmw resolve
-Work is finishing            -> wmw check
+Completed work is inspected -> nwc collect
+Context or an event arrives  -> nwc wake
+The action is completed      -> nwc resolve
+Work is finishing            -> nwc check
 ```
 
 `init` installs repository assets. `mcp` exposes the same four operations.
@@ -31,7 +31,7 @@ There is no manual add operation.
 ## Storage
 
 ```text
-.wmw/
+.nwc/
 ├── config.local.toml
 ├── config.toml
 ├── SKILL.md
@@ -46,7 +46,7 @@ team override; user configuration is the final fallback.
 ## Collection
 
 The harness supplies a bounded envelope: task, selected plan, final response,
-and Git diff. Internal `.wmw/**` files are excluded before the envelope is
+and Git diff. Internal `.nwc/**` files are excluded before the envelope is
 formed.
 
 The first judge pass proposes at most 20 deferments. Local validation requires:
@@ -81,12 +81,12 @@ returning strict JSON on stdout.
 
 ## Product boundaries
 
-Wake Me When is not a scheduler, issue tracker, roadmap generator, semantic reminder
+Now We Can is not a scheduler, issue tracker, roadmap generator, semantic reminder
 store, or autonomous executor. It does not infer unspecified future events and
 does not turn unfinished current scope into a deferment.
 
 NYA owns corrected failure memory. RTW owns proven implementation patterns. AVP
-owns executable acceptance. Wake Me When owns only evidence-backed conditional
+owns executable acceptance. Now We Can owns only evidence-backed conditional
 future work.
 
 ## Engineering constitution

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Paired agent benchmark for deterministic Wake Me When delivery."""
+"""Paired agent benchmark for deterministic Now We Can delivery."""
 
 from __future__ import annotations
 
@@ -183,7 +183,7 @@ def deferment_text(case: Case, commit: str):
             f"scopes = [{json.dumps(case.scope)}]",
             f"evidence = [{json.dumps(case.action)}, {json.dumps(case.blocker)}]",
             'recorded_at = "2026-01-01T00:00:00Z"',
-            'recorded_by = "Wake Me When benchmark fixture"',
+            'recorded_by = "Now We Can benchmark fixture"',
             f"recorded_commit = {json.dumps(commit)}",
             "",
             "[cue]",
@@ -198,7 +198,7 @@ def deferment_text(case: Case, commit: str):
 def initialize(root: Path, case: Case, arm: str, binary: Path):
     root.mkdir(parents=True)
     run(["git", "init", "-q"], root)
-    run(["git", "config", "user.name", "Wake Me When Benchmark"], root)
+    run(["git", "config", "user.name", "Now We Can Benchmark"], root)
     run(["git", "config", "user.email", "benchmark@example.test"], root)
     run(["git", "config", "core.autocrlf", "false"], root)
     (root / "AGENTS.md").write_text(
@@ -215,9 +215,9 @@ def initialize(root: Path, case: Case, arm: str, binary: Path):
     run(["git", "add", "."], root)
     run(["git", "commit", "-qm", "seed completed earlier work"], root)
     seed = run(["git", "rev-parse", "HEAD"], root).stdout.strip()
-    if arm == "wmw":
+    if arm == "nwc":
         run([binary, "init", "--agent-file", "AGENTS.md"], root)
-        directory = root / ".wmw/deferments"
+        directory = root / ".nwc/deferments"
         directory.mkdir(parents=True, exist_ok=True)
         (directory / f"benchmark-{case.name}.toml").write_text(
             deferment_text(case, seed), encoding="utf-8", newline="\n"
@@ -282,14 +282,14 @@ def execute(case, arm, root, output, binary, codex, model, codex_home):
         config.write(f"\n[projects.'{trusted}']\ntrust_level = \"trusted\"\n")
     due = None
     wake_seconds = None
-    if arm == "wmw":
+    if arm == "nwc":
         started = time.monotonic()
         awakened = run([binary, "wake", *event_args(case), "--json"], root)
         wake_seconds = round(time.monotonic() - started, 3)
         due = json.loads(awakened.stdout)
         if len(due["due"]) != 1:
             raise RuntimeError(f"{case.name} expected one due deferment: {awakened.stdout}")
-        (output / f"{case.name}-wmw-wake.json").write_text(
+        (output / f"{case.name}-nwc-wake.json").write_text(
             awakened.stdout, encoding="utf-8", newline="\n"
         )
     prompt = (
@@ -301,7 +301,7 @@ def execute(case, arm, root, output, binary, codex, model, codex_home):
         prompt += (
             "\n\nAUTOMATIC NOT YET HARNESS CONTEXT\n"
             "The deterministic cue below just became true. The due deferment is an "
-            "obligation in this task. Complete it, then run `wmw resolve --id <id> "
+            "obligation in this task. Complete it, then run `nwc resolve --id <id> "
             '--evidence "<proof>"` before finishing.\n'
             + json.dumps(due["due"], indent=2)
         )
@@ -353,13 +353,13 @@ def execute(case, arm, root, output, binary, codex, model, codex_home):
     )
     evaluation = evaluate(case, root)
     check_exit = None
-    if arm == "wmw":
+    if arm == "nwc":
         checked = run([binary, "check", *event_args(case), "--json"], root, check=False)
         check_exit = checked.returncode
-        (output / f"{case.name}-wmw-check.json").write_text(
+        (output / f"{case.name}-nwc-check.json").write_text(
             checked.stdout, encoding="utf-8", newline="\n"
         )
-        (output / f"{case.name}-wmw-check.stderr.log").write_text(
+        (output / f"{case.name}-nwc-check.stderr.log").write_text(
             checked.stderr, encoding="utf-8", newline="\n"
         )
     evaluation.update(
@@ -368,10 +368,10 @@ def execute(case, arm, root, output, binary, codex, model, codex_home):
             "arm": arm,
             "agent_exit": result.returncode,
             "seconds": seconds,
-            "wake_observed": arm == "wmw" and due is not None,
+            "wake_observed": arm == "nwc" and due is not None,
             "wake_seconds": wake_seconds,
-            "resolve_observed": arm == "wmw" and command_observed(events, "wmw resolve"),
-            "check_observed": arm == "wmw",
+            "resolve_observed": arm == "nwc" and command_observed(events, "nwc resolve"),
+            "check_observed": arm == "nwc",
             "check_exit": check_exit,
         }
     )
@@ -383,18 +383,18 @@ def render(summary):
     for item in summary["results"]:
         by_case.setdefault(item["case"], {})[item["arm"]] = item
     lines = [
-        "# Wake Me When Paired Agent Benchmark",
+        "# Now We Can Paired Agent Benchmark",
         "",
         f"Run from `{summary['started_at']}` to `{summary['completed_at']}` with "
         f"`{summary['agent']}` on `{summary['platform']}`.",
         "",
-        "| Case | Baseline | Wake Me When | Wake | Resolve | Check | Paired improvement |",
+        "| Case | Baseline | Now We Can | Wake | Resolve | Check | Paired improvement |",
         "| --- | --- | --- | --- | --- | --- | --- |",
     ]
     for case in CASES:
         if case.name not in by_case:
             continue
-        baseline, guided = by_case[case.name]["baseline"], by_case[case.name]["wmw"]
+        baseline, guided = by_case[case.name]["baseline"], by_case[case.name]["nwc"]
         improved = baseline["outcome"] == "deferment_missed" and guided["outcome"] == "pass"
         lines.append(
             f"| `{case.name}` | {baseline['outcome']} | {guided['outcome']} | "
@@ -407,7 +407,7 @@ def render(summary):
         "",
         f"Baseline deferments missed: **{summary['baseline_misses']}**.",
         "",
-        f"Wake Me When deferments missed: **{summary['wmw_misses']}**.",
+        f"Now We Can deferments missed: **{summary['nwc_misses']}**.",
         "",
         f"Paired improvements: **{summary['paired_improvements']} of "
         f"{summary['baseline_misses']} observed baseline misses**.",
@@ -417,7 +417,7 @@ def render(summary):
         f"Overall protocol result: **{'PASS' if summary['passed'] else 'FAIL'}**.",
         "",
         "A paired improvement counts only when the baseline completes the requested "
-        "task but misses the previously captured obligation, while the Wake Me When arm "
+        "task but misses the previously captured obligation, while the Now We Can arm "
         "completes both. Baseline passes are ties, never attributed preventions.",
         "",
         "The corpus is synthetic and the deferments are disclosed pre-captured fixtures. "
@@ -436,7 +436,7 @@ def render(summary):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--wmw", required=True, type=Path)
+    parser.add_argument("--nwc", required=True, type=Path)
     parser.add_argument("--output", required=True, type=Path)
     parser.add_argument("--codex", default=shutil.which("codex") or "codex")
     parser.add_argument("--model")
@@ -445,20 +445,20 @@ def main():
     parser.add_argument("--work-parent", type=Path, default=Path.cwd().parent)
     parser.add_argument("--keep-worktree", action="store_true")
     args = parser.parse_args()
-    binary = args.wmw.resolve()
+    binary = args.nwc.resolve()
     output = args.output.resolve()
     if not binary.is_file():
-        raise SystemExit(f"wmw binary not found: {binary}")
+        raise SystemExit(f"nwc binary not found: {binary}")
     if output.exists() and any(output.iterdir()):
         raise SystemExit(f"output directory is not empty: {output}")
     output.mkdir(parents=True, exist_ok=True)
     selected = [case for case in CASES if not args.case or case.name in args.case]
-    order = [(case, arm) for case in selected for arm in ("baseline", "wmw")]
+    order = [(case, arm) for case in selected for arm in ("baseline", "nwc")]
     random.Random(args.seed).shuffle(order)
     started_at = datetime.now(timezone.utc).isoformat()
     work_parent = args.work_parent.resolve()
     work_parent.mkdir(parents=True, exist_ok=True)
-    work = Path(tempfile.mkdtemp(prefix="wmw-paired-", dir=work_parent))
+    work = Path(tempfile.mkdtemp(prefix="nwc-paired-", dir=work_parent))
     results = []
     try:
         codex_home = work / "codex-home"
@@ -494,24 +494,24 @@ def main():
         baseline_misses = sum(
             pair["baseline"]["outcome"] == "deferment_missed" for pair in by_case.values()
         )
-        wmw_misses = sum(
-            pair["wmw"]["outcome"] == "deferment_missed" for pair in by_case.values()
+        nwc_misses = sum(
+            pair["nwc"]["outcome"] == "deferment_missed" for pair in by_case.values()
         )
         improvements = sum(
             pair["baseline"]["outcome"] == "deferment_missed"
-            and pair["wmw"]["outcome"] == "pass"
+            and pair["nwc"]["outcome"] == "pass"
             for pair in by_case.values()
         )
         regressions = sum(
             pair["baseline"]["outcome"] == "pass"
-            and pair["wmw"]["outcome"] != "pass"
+            and pair["nwc"]["outcome"] != "pass"
             for pair in by_case.values()
         )
         passed = (
-            all(pair["wmw"]["outcome"] == "pass" for pair in by_case.values())
-            and all(pair["wmw"]["wake_observed"] for pair in by_case.values())
-            and all(pair["wmw"]["resolve_observed"] for pair in by_case.values())
-            and all(pair["wmw"]["check_exit"] == 0 for pair in by_case.values())
+            all(pair["nwc"]["outcome"] == "pass" for pair in by_case.values())
+            and all(pair["nwc"]["wake_observed"] for pair in by_case.values())
+            and all(pair["nwc"]["resolve_observed"] for pair in by_case.values())
+            and all(pair["nwc"]["check_exit"] == 0 for pair in by_case.values())
             and regressions == 0
         )
         summary = {
@@ -522,7 +522,7 @@ def main():
             "agent": run([args.codex, "--version"], Path.cwd()).stdout.strip(),
             "model": args.model or "Codex CLI default",
             "codex_home": "isolated authentication-only home",
-            "wmw": {
+            "nwc": {
                 "version": run([binary, "--version"], Path.cwd()).stdout.strip(),
                 "sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
             },
@@ -530,7 +530,7 @@ def main():
             "seed": args.seed,
             "order": [f"{case.name}:{arm}" for case, arm in order],
             "baseline_misses": baseline_misses,
-            "wmw_misses": wmw_misses,
+            "nwc_misses": nwc_misses,
             "paired_improvements": improvements,
             "regressions": regressions,
             "results": results,

@@ -15,7 +15,7 @@ ALLOWED_CUES = "event, path_exists, path_absent, file_contains, file_not_contain
 
 def prompt_for(cases: list[dict]) -> str:
     envelopes = [{"case_id": case["id"], **case["envelope"]} for case in cases]
-    return f"""You are the bounded collector for Wake Me When.
+    return f"""You are the bounded collector for Now We Can.
 
 A deferment exists only when a completed task intentionally leaves a concrete
 temporary mechanism or next action undone because a prerequisite is currently
@@ -115,7 +115,7 @@ def score(cases: list[dict], output: dict) -> dict:
 
 
 def report(summary: dict) -> str:
-    lines = ["# Wake Me When genesis report", "", "This is a pre-product feasibility probe.", ""]
+    lines = ["# Now We Can genesis report", "", "This is a pre-product feasibility probe.", ""]
     for provider, error in summary.get("errors", {}).items():
         lines.extend([f"## {provider}", "", f"Provider failed: `{error}`", ""])
     for provider, result in summary["providers"].items():
@@ -150,7 +150,7 @@ def main() -> None:
     schema = json.loads((ROOT / "schema.json").read_text(encoding="utf-8"))
     prompt = prompt_for(cases)
     summary = {"providers": {}, "errors": {}}
-    with tempfile.TemporaryDirectory(prefix="wake-me-when-genesis-") as directory:
+    with tempfile.TemporaryDirectory(prefix="nwc-genesis-") as directory:
         work = Path(directory)
         for provider in args.provider:
             try:

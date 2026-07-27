@@ -8,12 +8,12 @@ use serde_json::{Value, json};
 use std::{collections::HashSet, ffi::OsString, fs, io::{self, BufRead, Write}, path::{Component, Path, PathBuf}, process::{Command, Stdio}};
 use ulid::Ulid;
 
-const SKILL: &str = include_str!("../assets/wake-me-when/SKILL.md");
+const SKILL: &str = include_str!("../assets/now-we-can/SKILL.md");
 const CONFIG: &str = include_str!("../assets/config.toml");
 const IGNORE: &str = include_str!("../assets/gitignore");
 const INSTRUCTIONS: &str = include_str!("../assets/AGENT_INSTRUCTIONS.md");
-const START: &str = "<!-- wmw:instructions:start -->";
-const END: &str = "<!-- wmw:instructions:end -->";
+const START: &str = "<!-- nwc:instructions:start -->";
+const END: &str = "<!-- nwc:instructions:end -->";
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
@@ -73,12 +73,14 @@ pub fn repository(path: &Path) -> Result<PathBuf> {
 
 pub fn init(root: &Path, agent_files: &[PathBuf]) -> Result<()> {
     let root = repository(root)?;
-    if root.join(".notyet").exists() && !root.join(".wmw").exists() {
-        fs::rename(root.join(".notyet"), root.join(".wmw"))?;
+    for legacy in [".wmw", ".notyet"] {
+        if root.join(legacy).exists() && !root.join(".nwc").exists() {
+            fs::rename(root.join(legacy), root.join(".nwc"))?;
+        }
     }
-    fs::create_dir_all(root.join(".wmw/deferments"))?;
-    write_new(root.join(".wmw/config.local.toml"), CONFIG)?;
-    fs::write(root.join(".wmw/SKILL.md"), SKILL)?;
+    fs::create_dir_all(root.join(".nwc/deferments"))?;
+    write_new(root.join(".nwc/config.local.toml"), CONFIG)?;
+    fs::write(root.join(".nwc/SKILL.md"), SKILL)?;
     append_once(root.join(".gitignore"), IGNORE)?;
     for file in agent_files {
         safe_relative(file)?;
@@ -135,7 +137,7 @@ pub fn collect(root: &Path, request: CollectRequest) -> Result<CollectResult> {
             resolution_evidence: None,
         };
         write_new(
-            root.join(format!(".wmw/deferments/{}.toml", deferment.id)),
+            root.join(format!(".nwc/deferments/{}.toml", deferment.id)),
             &toml::to_string_pretty(&deferment)?,
         )?;
         recorded.push(deferment);
@@ -163,8 +165,8 @@ pub fn resolve(root: &Path, id: &str, evidence: &str) -> Result<Deferment> {
     let root = repository(root)?;
     require_text("id", id)?;
     require_text("evidence", evidence)?;
-    let path = root.join(format!(".wmw/deferments/{id}.toml"));
-    safe_relative(Path::new(&format!(".wmw/deferments/{id}.toml")))?;
+    let path = root.join(format!(".nwc/deferments/{id}.toml"));
+    safe_relative(Path::new(&format!(".nwc/deferments/{id}.toml")))?;
     let mut item: Deferment = toml::from_str(&fs::read_to_string(&path).with_context(|| format!("unknown deferment {id}"))?)?;
     if item.resolved_at.is_some() {
         bail!("deferment {id} is already resolved")
@@ -176,9 +178,9 @@ pub fn resolve(root: &Path, id: &str, evidence: &str) -> Result<Deferment> {
 }
 
 fn load(root: &Path) -> Result<Vec<Deferment>> {
-    let directory = root.join(".wmw/deferments");
+    let directory = root.join(".nwc/deferments");
     if !directory.exists() {
-        bail!("Wake Me When is not initialized; run wmw init")
+        bail!("Now We Can is not initialized; run nwc init")
     }
     let mut paths = fs::read_dir(directory)?
         .map(|entry| entry.map(|value| value.path()))
@@ -201,7 +203,7 @@ fn collect_prompt(envelope: &str, candidates: Option<&[Candidate]>) -> Result<St
         "Extract conditional deferments from the envelope.".into()
     };
     Ok(format!(
-        "You are the bounded Wake Me When collector. {phase} A deferment requires a concrete action intentionally left undone because a currently false prerequisite blocks it, a machine-checkable cue, at least one reusable glob scope, and at least two evidence strings copied verbatim from the envelope. Allowed cue kinds: event (empty path, stable event value), path_exists/path_absent (repository-relative path, empty value), file_contains/file_not_contains (repository-relative path and literal value). Reject aspirations, optional improvements, unfinished current scope, permanent behavior, vague later work, completed work, and invented facts. Return strict JSON {{\"deferments\":[{{\"title\":\"\",\"action\":\"\",\"blocker\":\"\",\"cue\":{{\"kind\":\"event\",\"path\":\"\",\"value\":\"\"}},\"scopes\":[\"src/**\"],\"evidence\":[\"verbatim fragment\",\"verbatim fragment\"]}}]}} and nothing else.\nENVELOPE:\n{envelope}"
+        "You are the bounded Now We Can collector. {phase} A deferment requires a concrete action intentionally left undone because a currently false prerequisite blocks it, a machine-checkable cue, at least one reusable glob scope, and at least two evidence strings copied verbatim from the envelope. Allowed cue kinds: event (empty path, stable event value), path_exists/path_absent (repository-relative path, empty value), file_contains/file_not_contains (repository-relative path and literal value). Reject aspirations, optional improvements, unfinished current scope, permanent behavior, vague later work, completed work, and invented facts. Return strict JSON {{\"deferments\":[{{\"title\":\"\",\"action\":\"\",\"blocker\":\"\",\"cue\":{{\"kind\":\"event\",\"path\":\"\",\"value\":\"\"}},\"scopes\":[\"src/**\"],\"evidence\":[\"verbatim fragment\",\"verbatim fragment\"]}}]}} and nothing else.\nENVELOPE:\n{envelope}"
     ))
 }
 
@@ -284,27 +286,17 @@ fn judge(root: &Path, prompt: &str) -> Result<Extraction> {
     serde_json::from_slice(&output.stdout).context("judge returned invalid JSON")
 }
 
+#[rustfmt::skip]
 fn load_config(root: &Path) -> Result<Config> {
-    let user = dirs::config_dir().map(|path| path.join("wake-me-when/config.toml"));
-    let path = [Some(root.join(".wmw/config.local.toml")), Some(root.join(".wmw/config.toml")), user]
-        .into_iter()
-        .flatten()
-        .find(|path| path.exists())
-        .ok_or_else(|| anyhow!("missing judge configuration"))?;
+    let user = dirs::config_dir().map(|path| path.join("now-we-can/config.toml"));
+    let path = [Some(root.join(".nwc/config.local.toml")), Some(root.join(".nwc/config.toml")), user].into_iter().flatten().find(|path| path.exists()).ok_or_else(|| anyhow!("missing judge configuration"))?;
     toml::from_str(&fs::read_to_string(path)?).context("invalid judge configuration")
 }
 
+#[rustfmt::skip]
 fn diff(root: &Path, base: &str) -> Result<String> {
-    let mut value = git(
-        root,
-        &["diff", "--no-ext-diff", "--unified=3", base, "--", ".", ":(exclude).wmw/**"],
-    )?;
-    for path in git(
-        root,
-        &["ls-files", "--others", "--exclude-standard", "--", ".", ":(exclude).wmw/**"],
-    )?
-    .lines()
-    {
+    let mut value = git(root, &["diff", "--no-ext-diff", "--unified=3", base, "--", ".", ":(exclude).nwc/**", ":(exclude).wmw/**", ":(exclude).notyet/**"])?;
+    for path in git(root, &["ls-files", "--others", "--exclude-standard", "--", ".", ":(exclude).nwc/**", ":(exclude).wmw/**", ":(exclude).notyet/**"])?.lines() {
         let contents = fs::read_to_string(root.join(path)).with_context(|| format!("untracked file is not auditable text: {path}"))?;
         value.push_str(&format!("\ndiff --git a/{path} b/{path}\n--- /dev/null\n+++ b/{path}\n"));
         for line in contents.lines() {
@@ -346,12 +338,12 @@ fn validate_revision(value: &str) -> Result<()> { if value.is_empty() || value.s
 #[rustfmt::skip]
 fn write_new(path: PathBuf, contents: &str) -> Result<()> { if !path.exists() { fs::write(path, contents)?; } Ok(()) }
 #[rustfmt::skip]
-fn append_once(path: PathBuf, block: &str) -> Result<()> { let current = fs::read_to_string(&path).unwrap_or_default(); let block = block.replace("\r\n", "\n"); if !current.replace("\r\n", "\n").contains(block.trim()) { fs::write(path, format!("{}{}{}\n", current, if current.is_empty() || current.ends_with('\n') { "" } else { "\n" }, block.trim()))?; } Ok(()) }
+fn append_once(path: PathBuf, block: &str) -> Result<()> { let current = fs::read_to_string(&path).unwrap_or_default().replace("# Wake Me When local configuration and disposable state\r\n.wmw/config.local.toml", block.trim()).replace("# Wake Me When local configuration and disposable state\n.wmw/config.local.toml", block.trim()); let block = block.replace("\r\n", "\n"); if !current.replace("\r\n", "\n").contains(block.trim()) { fs::write(path, format!("{}{}{}\n", current, if current.is_empty() || current.ends_with('\n') { "" } else { "\n" }, block.trim()))?; } else { fs::write(path, current)?; } Ok(()) }
 #[rustfmt::skip]
-fn upsert_block(path: PathBuf, block: &str) -> Result<()> { let current = fs::read_to_string(&path).unwrap_or_default().replace("<!-- notyet:instructions:start -->", START).replace("<!-- notyet:instructions:end -->", END); let updated = if let (Some(start), Some(end)) = (current.find(START), current.find(END)) { format!("{}{}{}", &current[..start], block.trim(), &current[end + END.len()..]) } else { format!("{}{}{}\n", current, if current.is_empty() || current.ends_with('\n') { "" } else { "\n" }, block.trim()) }; fs::write(path, updated)?; Ok(()) }
+fn upsert_block(path: PathBuf, block: &str) -> Result<()> { let current = fs::read_to_string(&path).unwrap_or_default().replace("<!-- notyet:instructions:start -->", START).replace("<!-- notyet:instructions:end -->", END).replace("<!-- wmw:instructions:start -->", START).replace("<!-- wmw:instructions:end -->", END); let updated = if let (Some(start), Some(end)) = (current.find(START), current.find(END)) { format!("{}{}{}", &current[..start], block.trim(), &current[end + END.len()..]) } else { format!("{}{}{}\n", current, if current.is_empty() || current.ends_with('\n') { "" } else { "\n" }, block.trim()) }; fs::write(path, updated)?; Ok(()) }
 
 #[derive(Parser)]
-#[command(name = "wmw", version, about = "Make deferred agent intentions executable")]
+#[command(name = "nwc", version, about = "Wake deferred agent intentions when their cue becomes true")]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -402,7 +394,7 @@ pub fn run_cli_at(arguments: Vec<OsString>, current: &Path, input: &mut dyn BufR
     match cli.command {
         Commands::Init(args) => {
             init(current, &args.agent_file)?;
-            writeln!(output, "Wake Me When initialized.")?;
+            writeln!(output, "Now We Can initialized.")?;
         }
         Commands::Collect(args) => {
             let root = repository(current)?;
@@ -471,7 +463,7 @@ pub fn mcp_stream(reader: &mut dyn BufRead, output: &mut dyn Write) -> Result<()
         let id = request["id"].clone();
         let response = match request["method"].as_str().unwrap_or_default() {
             "initialize" => {
-                json!({"jsonrpc":"2.0","id":id,"result":{"protocolVersion":"2025-11-25","capabilities":{"tools":{}},"serverInfo":{"name":"wake-me-when","version":env!("CARGO_PKG_VERSION")}}})
+                json!({"jsonrpc":"2.0","id":id,"result":{"protocolVersion":"2025-11-25","capabilities":{"tools":{}},"serverInfo":{"name":"now-we-can","version":env!("CARGO_PKG_VERSION")}}})
             }
             "ping" => json!({"jsonrpc":"2.0","id":id,"result":{}}),
             "tools/list" => json!({"jsonrpc":"2.0","id":id,"result":{"tools":mcp_tools()}}),
@@ -496,10 +488,10 @@ pub fn mcp_stream(reader: &mut dyn BufRead, output: &mut dyn Write) -> Result<()
 
 fn mcp_tools() -> Value {
     json!([
-        {"name":"wmw_collect","description":"Collect evidence-backed conditional deferments from completed work","inputSchema":{"type":"object","required":["repository","task"],"properties":{"repository":{"type":"string"},"task":{"type":"string"},"plan":{"type":"string"},"final_message":{"type":"string"},"base":{"type":"string"}}}},
-        {"name":"wmw_wake","description":"Return active deferments whose deterministic cue is now true","inputSchema":{"type":"object","required":["repository"],"properties":{"repository":{"type":"string"},"events":{"type":"array","items":{"type":"string"}}}}},
-        {"name":"wmw_resolve","description":"Resolve a completed deferment with evidence","inputSchema":{"type":"object","required":["repository","id","evidence"],"properties":{"repository":{"type":"string"},"id":{"type":"string"},"evidence":{"type":"string"}}}},
-        {"name":"wmw_check","description":"Fail closed when a due deferment remains unresolved","inputSchema":{"type":"object","required":["repository"],"properties":{"repository":{"type":"string"},"events":{"type":"array","items":{"type":"string"}}}}}
+        {"name":"nwc_collect","description":"Collect evidence-backed conditional deferments from completed work","inputSchema":{"type":"object","required":["repository","task"],"properties":{"repository":{"type":"string"},"task":{"type":"string"},"plan":{"type":"string"},"final_message":{"type":"string"},"base":{"type":"string"}}}},
+        {"name":"nwc_wake","description":"Return active deferments whose deterministic cue is now true","inputSchema":{"type":"object","required":["repository"],"properties":{"repository":{"type":"string"},"events":{"type":"array","items":{"type":"string"}}}}},
+        {"name":"nwc_resolve","description":"Resolve a completed deferment with evidence","inputSchema":{"type":"object","required":["repository","id","evidence"],"properties":{"repository":{"type":"string"},"id":{"type":"string"},"evidence":{"type":"string"}}}},
+        {"name":"nwc_check","description":"Fail closed when a due deferment remains unresolved","inputSchema":{"type":"object","required":["repository"],"properties":{"repository":{"type":"string"},"events":{"type":"array","items":{"type":"string"}}}}}
     ])
 }
 
@@ -508,7 +500,7 @@ fn mcp_call(parameters: &Value) -> Result<Value> {
     let arguments = &parameters["arguments"];
     let root = Path::new(arguments["repository"].as_str().context("repository is required")?);
     match name {
-        "wmw_collect" => {
+        "nwc_collect" => {
             let request = CollectRequest {
                 task: arguments["task"].as_str().context("task is required")?.into(),
                 plan: arguments["plan"].as_str().unwrap_or_default().into(),
@@ -517,14 +509,14 @@ fn mcp_call(parameters: &Value) -> Result<Value> {
             };
             Ok(serde_json::to_value(collect(root, request)?)?)
         }
-        "wmw_wake" | "wmw_check" => {
+        "nwc_wake" | "nwc_check" => {
             let events: Vec<String> = arguments["events"]
                 .as_array()
                 .map(|items| items.iter().filter_map(Value::as_str).map(str::to_owned).collect())
                 .unwrap_or_default();
             Ok(serde_json::to_value(wake(root, &events)?)?)
         }
-        "wmw_resolve" => Ok(serde_json::to_value(resolve(
+        "nwc_resolve" => Ok(serde_json::to_value(resolve(
             root,
             arguments["id"].as_str().context("id is required")?,
             arguments["evidence"].as_str().context("evidence is required")?,
