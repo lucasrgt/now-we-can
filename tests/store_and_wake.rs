@@ -7,6 +7,11 @@ use wmw::{Cue, CueKind};
 #[test]
 fn init_installs_assets_idempotently_and_confines_paths() {
     let temp = repo();
+    fs::write(
+        temp.path().join(".gitignore"),
+        "# Existing\r\n\r\n# Wake Me When local configuration and disposable state\r\n.wmw/config.local.toml\r\n",
+    )
+    .unwrap();
     wmw::init(temp.path(), &[Path::new("AGENTS.md").into(), Path::new("CLAUDE.md").into()]).unwrap();
     wmw::init(temp.path(), &[Path::new("AGENTS.md").into()]).unwrap();
     assert!(temp.path().join(".wmw/SKILL.md").is_file());
@@ -22,6 +27,13 @@ fn init_installs_assets_idempotently_and_confines_paths() {
         fs::read_to_string(temp.path().join(".gitignore"))
             .unwrap()
             .contains(".wmw/config.local.toml")
+    );
+    assert_eq!(
+        fs::read_to_string(temp.path().join(".gitignore"))
+            .unwrap()
+            .matches(".wmw/config.local.toml")
+            .count(),
+        1
     );
     assert!(wmw::init(temp.path(), &[Path::new("../outside.md").into()]).is_err());
     assert!(wmw::repository(Path::new("Z:/definitely-not-a-repository")).is_err());

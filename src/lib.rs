@@ -345,7 +345,7 @@ fn validate_revision(value: &str) -> Result<()> { if value.is_empty() || value.s
 #[rustfmt::skip]
 fn write_new(path: PathBuf, contents: &str) -> Result<()> { if !path.exists() { fs::write(path, contents)?; } Ok(()) }
 #[rustfmt::skip]
-fn append_once(path: PathBuf, block: &str) -> Result<()> { let current = fs::read_to_string(&path).unwrap_or_default(); if !current.contains(block.trim()) { fs::write(path, format!("{}{}{}\n", current, if current.is_empty() || current.ends_with('\n') { "" } else { "\n" }, block.trim()))?; } Ok(()) }
+fn append_once(path: PathBuf, block: &str) -> Result<()> { let current = fs::read_to_string(&path).unwrap_or_default(); if !current.replace("\r\n", "\n").contains(block.trim()) { fs::write(path, format!("{}{}{}\n", current, if current.is_empty() || current.ends_with('\n') { "" } else { "\n" }, block.trim()))?; } Ok(()) }
 #[rustfmt::skip]
 fn upsert_block(path: PathBuf, block: &str) -> Result<()> { let current = fs::read_to_string(&path).unwrap_or_default().replace("<!-- notyet:instructions:start -->", START).replace("<!-- notyet:instructions:end -->", END); let updated = if let (Some(start), Some(end)) = (current.find(START), current.find(END)) { format!("{}{}{}", &current[..start], block.trim(), &current[end + END.len()..]) } else { format!("{}{}{}\n", current, if current.is_empty() || current.ends_with('\n') { "" } else { "\n" }, block.trim()) }; fs::write(path, updated)?; Ok(()) }
 

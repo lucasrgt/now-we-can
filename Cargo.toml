@@ -1,6 +1,6 @@
 [package]
 name = "wake-me-when"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 description = "Repository-local prospective memory for coding agents"
 repository = "https://github.com/lucasrgt/wake-me-when"
