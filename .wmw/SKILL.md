@@ -9,7 +9,7 @@ description: Collect, wake, resolve, and enforce evidence-backed conditional def
    the host supplies a new event. Due deferments are obligations.
 2. Use `wmw resolve --id <id> --evidence "<proof>"` only after completing the
    deferred action.
-3. The host runs `wmw collect --task "<goal>" --plan <file> --final <file>`
+3. The host runs `wmw collect --task "<goal>" --plan <file> --final-message <file>`
    after work. Do not create deferments manually.
 4. A deferment requires a concrete future action, a currently false blocker, a
    machine-checkable cue, reusable scope, and verbatim evidence from the task,

@@ -1,14 +1,37 @@
+<p align="center">
+  <img src="assets/logo.png" alt="Wake Me When armored sleepy mascot" width="460">
+</p>
+
 <h1 align="center">Wake Me When</h1>
 
 <p align="center"><strong>Wake future work exactly when it becomes possible.</strong></p>
 
-Coding agents routinely finish a task with polished future work: phase two,
-remove a fallback after migration, adopt the official API when it ships. That
-prose usually disappears with the session.
+<p align="center">
+  <a href="#quick-install-with-your-agent">Quick Install</a> |
+  <a href="#getting-started">Getting Started</a> |
+  <a href="#the-deferment-model">Deferments</a> |
+  <a href="#integrations">Integrations</a> |
+  <a href="#benchmarks">Benchmarks</a> |
+  <a href="ARCHITECTURE.md">Architecture</a>
+</p>
 
-Wake Me When automatically collects only **evidence-backed conditional deferments**,
-wakes them when their machine-checkable cue becomes true, and fails completion
-while due work remains unresolved.
+<p align="center">
+  <a href="https://github.com/lucasrgt/wake-me-when/actions/workflows/ci.yml"><img src="https://github.com/lucasrgt/wake-me-when/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI"></a>
+  <a href="https://github.com/lucasrgt/wake-me-when/releases"><img src="https://img.shields.io/github/v/release/lucasrgt/wake-me-when?style=flat-square" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2EA44F?style=flat-square" alt="MIT License"></a>
+  <img src="https://img.shields.io/badge/runtime-single%20Rust%20binary-B7410E?style=flat-square&logo=rust&logoColor=white" alt="Single Rust binary">
+  <img src="https://img.shields.io/badge/storage-repository--local-5B3FD8?style=flat-square" alt="Repository-local">
+</p>
+
+Coding agents routinely finish a task with legitimate future work: remove a
+fallback after a migration, adopt an API when it ships, or begin the next phase
+after an acceptance gate passes. That intention usually disappears with the
+session or becomes an unactionable TODO.
+
+Wake Me When captures only **evidence-backed conditional deferments**, versions
+them with the repository, and delivers them when their exact machine-checkable
+cue becomes true. Due work cannot silently disappear behind context
+compaction, a different agent, or a later task.
 
 ```text
 Completed work contains a proven deferment -> wmw collect
@@ -17,19 +40,56 @@ The deferred action is completed           -> wmw resolve
 Work is about to finish                    -> wmw check
 ```
 
-There is deliberately no `wmw add`. Capture and delivery belong to the
-harness, not to an agent remembering to maintain another memory tool.
+<table>
+<tr><td><b>One durable concept</b></td><td>A deferment records one concrete future action, its current blocker, an observable cue, reusable scope, and verbatim evidence.</td></tr>
+<tr><td><b>Automatic capture</b></td><td>Two isolated judge passes must return the same evidence-bounded candidate. There is deliberately no manual <code>wmw add</code>.</td></tr>
+<tr><td><b>Deterministic waking</b></td><td>Events, path presence or absence, and literal file-content conditions are evaluated without a model.</td></tr>
+<tr><td><b>Repository-owned memory</b></td><td>Readable TOML deferments travel through Git with the team. No hosted service or daemon owns the truth.</td></tr>
+<tr><td><b>Harness-owned delivery</b></td><td>The skill and managed instructions tell any host when to collect, wake, resolve, and check. Delivery does not depend on agent memory.</td></tr>
+<tr><td><b>Agent and language independent</b></td><td>Any Git codebase and any shell or MCP-capable agent can use the same native binary.</td></tr>
+</table>
 
-| Property | Contract |
-| --- | --- |
-| One durable concept | A deferment is a concrete future action, its current blocker, an observable cue, scope, and verbatim evidence. |
-| Evidence bounded | Two isolated passes must return the same candidate; every evidence fragment must exist in the task envelope. |
-| Deterministic waking | Events, path presence/absence, and literal file-content cues require no model. |
-| Repository native | Readable TOML files are versioned with the team. |
-| Agent independent | Native CLI, portable skill, and local stdio MCP call the same core. |
-| Fail closed | Invalid evidence, judge failure, malformed storage, and due unresolved work cannot become a pass. |
+Wake Me When is prospective repository memory. It answers one durable
+question:
 
-## Install
+> Which proven future action is due now?
+
+---
+
+## Quick install with your agent
+
+Copy this prompt into any coding agent with terminal access:
+
+```text
+Set up Wake Me When in this Git repository.
+
+Download the latest stable binary for this machine from
+https://github.com/lucasrgt/wake-me-when/releases and verify its published
+SHA256SUMS entry. Use no third-party package and do not build from source.
+
+Install `wmw` in a user-local PATH location without administrator access or
+adding runtime dependencies to the repository. Confirm with `wmw --version`.
+
+At the repository root, run `wmw init --agent-file AGENTS.md`. If CLAUDE.md,
+GEMINI.md, or another tracked agent instruction file is actively used, pass
+one additional `--agent-file` option for each applicable file. Preserve all
+existing content.
+
+Read `.wmw/SKILL.md`. Confirm that `.wmw/deferments/` and `.wmw/SKILL.md` are
+versioned while `.wmw/config.local.toml` is ignored. Keep the default local
+Codex judge when Codex is available. Otherwise configure the local judge
+command for the available noninteractive model CLI. Never commit credentials
+or personal judge configuration.
+
+Run `wmw wake`, then `wmw check`. Do not create deferments manually and do not
+collect setup prose as future work.
+
+Do not commit, push, or modify unrelated files. Report the installed version,
+changed files, active judge command, migration performed if any, and any
+action still required.
+```
+
+### Manual installation
 
 Linux and macOS:
 
@@ -43,35 +103,86 @@ Windows PowerShell:
 irm https://raw.githubusercontent.com/lucasrgt/wake-me-when/main/scripts/install.ps1 | iex
 ```
 
-From source:
+Build from source:
 
 ```bash
 cargo install --git https://github.com/lucasrgt/wake-me-when --locked
 ```
 
-## Quick start
+WMW is one native binary. It requires no hosted service, daemon, Node runtime,
+Python runtime, or project-language integration.
+
+---
+
+## Getting started
+
+Initialize a Git repository and connect the portable skill to the instruction
+files its agents actually read:
 
 ```bash
-wmw init --agent-file AGENTS.md --agent-file CLAUDE.md
+wmw init \
+  --agent-file AGENTS.md \
+  --agent-file CLAUDE.md
 ```
 
-Repositories initialized by Not Yet 0.1 migrate automatically on the first
-`wmw init`: `.notyet` becomes `.wmw`, existing deferments are preserved, and
-managed agent instructions are replaced in place. MCP hosts must update tool
-names from `notyet_*` to `wmw_*`.
-
-At task completion, a harness supplies the task artifacts. Codex can write its
-last response with `--output-last-message`; other hosts can pass equivalent
-content through MCP.
+At task completion, the harness supplies the task, selected plan, final
+response, and current diff:
 
 ```bash
 wmw collect \
-  --task "Migrate customers while mobile v1 remains active" \
+  --task "Migrate customer writes while mobile v1 remains active" \
   --plan ROADMAP.md \
   --final-message .agent-last.md
 ```
 
-An accepted deferment looks like:
+If the evidence proves that cleanup must wait for a stable external condition,
+WMW records the deferment. When the host later observes that condition:
+
+```bash
+wmw wake --event mobile-v1-retired
+```
+
+The due action returns with its original blocker, evidence, scope, and cue.
+After completing the work:
+
+```bash
+wmw resolve \
+  --id 01k... \
+  --evidence "commit abc123 and AVP customer-write verdict"
+
+wmw check --event mobile-v1-retired
+```
+
+### The harness lifecycle
+
+| Moment | Command | Result |
+| --- | --- | --- |
+| Task start | `wmw wake` with every currently observed event | Due obligations enter context before editing |
+| New external event | `wmw wake --event <stable-name>` | Event-backed deferments become actionable |
+| Context reset or compaction | Rerun `wmw wake` | Due work survives the lost conversation |
+| Deferred action completed | `wmw resolve --id <id> --evidence "<proof>"` | The original record remains with resolution evidence |
+| Task completion | `wmw collect --task ... --plan ... --final-message ...` | Newly proven conditional work is captured |
+| Pre-commit, review, or pre-push | `wmw check` with the same observed events | Completion stops while due work remains unresolved |
+
+`wake` and `check` are intentionally repeatable. The host should invoke them
+again whenever events, repository state, task scope, or context changes.
+
+### Exit codes
+
+| Code | CLI meaning | Required action |
+| --- | --- | --- |
+| `0` | The operation completed and no supplied or repository cue leaves due unresolved work | Continue |
+| `1` | `check` found at least one due unresolved deferment | Complete or explicitly resolve the obligation, then rerun |
+| `2` | Repository, storage, configuration, judge, protocol, or output failure | Treat the operation as incomplete |
+
+Judge and storage failures do not become successful CLI checks.
+
+---
+
+## The deferment model
+
+A deferment is not a reminder. It is a conditional obligation backed by
+evidence from completed work.
 
 ```toml
 schema = 1
@@ -84,6 +195,9 @@ evidence = [
   "mobile v1 still reads LegacyName",
   "customer.LegacyName = input.Name"
 ]
+recorded_at = "2026-07-26T12:00:00Z"
+recorded_by = "Ana Developer"
+recorded_commit = "9e8d..."
 
 [cue]
 kind = "event"
@@ -91,110 +205,319 @@ path = ""
 value = "mobile-v1-retired"
 ```
 
-When the host observes the event:
+A valid deferment answers five questions:
 
-```bash
-wmw wake --event mobile-v1-retired
-```
-
-After doing the work:
-
-```bash
-wmw resolve --id 01k... --evidence "commit abc123 and AVP customer-write verdict"
-wmw check --event mobile-v1-retired
-```
-
-`check` exits `1` while any supplied event or current repository state makes an
-active deferment due. Protocol or storage failures exit `2`.
-
-## Cue kinds
-
-| Kind | Becomes due when |
+| Question | Field |
 | --- | --- |
-| `event` | The host supplies the exact stable event name |
-| `path_exists` | A repository-relative path exists |
-| `path_absent` | A repository-relative path no longer exists |
-| `file_contains` | A repository file contains the literal value |
-| `file_not_contains` | An existing repository file no longer contains the literal value |
+| What concrete work will become required? | `action` |
+| Why is it intentionally impossible or incorrect now? | `blocker` |
+| What exact observation makes it actionable? | `cue` |
+| Where does the obligation apply? | `scopes` |
+| Which completed-work artifact proves the claim? | `evidence` |
 
-The collector may not invent a path or event. A vague statement such as
-“improve this later” is rejected. Work left incomplete inside the current task
-is also rejected: Wake Me When must never launder incomplete work into a roadmap.
+### What belongs in a deferment
+
+| Record | Reject |
+| --- | --- |
+| Remove compatibility code after a named client version retires | Finish work omitted from the current task |
+| Adopt an official API after its tracked module or event exists | A vague aspiration such as "improve this later" |
+| Begin the next phase after a stable acceptance event passes | Optional polish with no real blocker |
+| Delete a fallback when a named file no longer contains the legacy contract | Permanent behavior disguised as temporary work |
+| A concrete action with two verbatim evidence fragments | An invented path, event, blocker, or prerequisite |
+
+WMW must never launder incomplete current scope into a future roadmap.
+
+---
+
+## Deterministic cues
+
+Waking does not call a model. Each active deferment has one exact cue:
+
+| Cue kind | Becomes due when | Required fields |
+| --- | --- | --- |
+| `event` | The host supplies the exact stable event name | `value` |
+| `path_exists` | A repository-relative path exists | `path` |
+| `path_absent` | A repository-relative path no longer exists | `path` |
+| `file_contains` | A repository text file contains the literal value | `path`, `value` |
+| `file_not_contains` | An existing repository text file no longer contains the literal value | `path`, `value` |
+
+`file_not_contains` requires the file to exist. A missing or unreadable file
+cannot create a vacuous pass.
+
+Events are supplied by the host, which makes WMW composable with CI, release
+automation, GitHub, deployment systems, AVP verdicts, feature-flag retirement,
+or any other source capable of emitting a stable name:
+
+```bash
+wmw wake \
+  --event avp:customer-write:passed \
+  --event deployment:mobile-v1:retired
+```
+
+---
 
 ## Automatic collection
 
+There is deliberately no `wmw add`. Capture belongs to the harness, not to an
+agent remembering to maintain another memory tool.
+
+```mermaid
+flowchart LR
+    WORK["Completed work"] --> ENVELOPE["Bounded evidence envelope"]
+    ENVELOPE --> PASS1["Isolated extraction"]
+    PASS1 --> PASS2["Independent confirmation"]
+    PASS2 --> VALIDATE["Local evidence and cue validation"]
+    VALIDATE --> TOML["Versioned deferment"]
+    TOML --> WAKE["Deterministic wake"]
+```
+
 The collection envelope contains only:
 
-- current task;
+- the current task;
 - selected plan or roadmap text;
-- final agent response;
-- Git diff, including untracked text files;
+- the final agent response;
+- the Git diff, including untracked text files;
 - first-pass candidates during confirmation.
 
-`.wmw/**` is always excluded from the diff so local judge files and prior
-memory can never prove their own claims. The first pass extracts candidates.
-The second isolated pass receives only those candidates and the same envelope.
-Only structurally identical candidates survive. Evidence strings are then
-checked locally as verbatim substrings before TOML is written.
+Internal `.wmw/**` files are always excluded from the diff. Prior deferments,
+local judge files, and WMW's own instructions cannot prove a new candidate.
 
-## Wake Me When, NYA, RTW, and AVP
+The first isolated pass proposes at most 20 deferments. Local validation
+requires:
 
-The projects remain independent:
+1. non-empty title, action, and blocker;
+2. at least one valid reusable glob scope;
+3. at least two evidence fragments copied verbatim from the envelope;
+4. one structurally valid deterministic cue;
+5. repository-confined paths.
+
+The second isolated pass receives the same envelope and first-pass candidates.
+Only structurally identical candidates survive. Existing active
+action, blocker, and cue triples are deduplicated.
+
+### Deterministic capture bounds, probabilistic extraction
+
+| Deterministic WMW guarantee | Model-dependent judgment |
+| --- | --- |
+| Bound the collection envelope and candidate count | Decide whether the prose describes a legitimate conditional deferment |
+| Require two matching isolated passes | Interpret whether the blocker is real and the action is concrete |
+| Verify evidence as verbatim envelope substrings | Separate intentional deferment from optional polish |
+| Validate cue shape, scopes, and repository-relative paths | Choose the most faithful cue described by the evidence |
+| Deduplicate active action, blocker, and cue triples | Express a concise reusable action and blocker |
+
+WMW constrains model judgment. It does not replace model intelligence.
+
+---
+
+## Repository storage and configuration
+
+`wmw init` creates:
+
+```text
+.wmw/
+  config.local.toml
+  SKILL.md
+  deferments/
+    <ulid>.toml
+```
+
+Commit `.wmw/SKILL.md` and `.wmw/deferments/` so every clone receives the same
+protocol and obligations. `.wmw/config.local.toml` remains ignored because the
+judge executable and local environment belong to each developer or harness.
+
+Optional team configuration may live at `.wmw/config.toml`. Configuration is
+resolved in this order:
+
+1. `.wmw/config.local.toml`;
+2. `.wmw/config.toml`;
+3. the user configuration directory at `wake-me-when/config.toml`.
+
+The judge command reads one prompt from standard input and must emit strict
+JSON on standard output:
+
+```toml
+schema = 1
+
+[judge]
+command = [
+  "codex",
+  "exec",
+  "--ignore-user-config",
+  "--ignore-rules",
+  "--ephemeral",
+  "--skip-git-repo-check",
+  "--sandbox",
+  "read-only",
+  "-"
+]
+```
+
+TOML deferments are the durable source of truth. WMW does not require SQLite or
+another generated index to wake them.
+
+---
+
+## Integrations
+
+### CLI
+
+The CLI is the universal surface for shell-capable agents, hooks, CI, and local
+development:
+
+```bash
+wmw wake --json
+wmw check --json
+```
+
+`--json` keeps standard output machine-readable for orchestration.
+
+### MCP
+
+Start the local stdio server:
+
+```bash
+wmw mcp
+```
+
+A typical MCP host entry is:
+
+```json
+{
+  "mcpServers": {
+    "wake-me-when": {
+      "command": "wmw",
+      "args": ["mcp"]
+    }
+  }
+}
+```
+
+The server exposes the same core operations:
+
+| MCP tool | Purpose |
+| --- | --- |
+| `wmw_collect` | Collect evidence-backed deferments from completed work |
+| `wmw_wake` | Return active deferments whose cues are currently true |
+| `wmw_resolve` | Record completion and resolution evidence |
+| `wmw_check` | Return the current due-work result for host enforcement |
+
+### Portable skill
+
+`.wmw/SKILL.md` defines the lifecycle independently of any one agent vendor.
+Managed instruction blocks can be installed into `AGENTS.md`, `CLAUDE.md`,
+`GEMINI.md`, or another repository instruction file:
+
+```bash
+wmw init \
+  --agent-file AGENTS.md \
+  --agent-file CLAUDE.md \
+  --agent-file GEMINI.md
+```
+
+Initialization is idempotent and preserves human-authored content.
+
+### The AeroFortress foundation
+
+The projects remain independent and composable:
 
 | Project | Durable question |
 | --- | --- |
 | Wake Me When | Which proven future action is due now? |
 | [Right This Way](https://github.com/lucasrgt/right-this-way) | How does this repository already implement this correctly? |
 | [Not You Again](https://github.com/lucasrgt/not-you-again) | Which corrected failure must not recur? |
-| [AVP](https://github.com/lucasrgt/acceptance-verification-protocol) | Which acceptance behavior must hold? |
+| [Acceptance Verification Protocol](https://github.com/lucasrgt/acceptance-verification-protocol) | Which acceptance behavior must hold? |
 
-An AVP verdict can arrive as a Wake Me When event, waking the next roadmap phase.
-RTW then supplies the positive precedent, NYA supplies relevant scars, and AVP
-proves the new phase.
+An AVP verdict can arrive as a WMW event and wake the next roadmap phase. RTW
+can supply the positive precedent, NYA can supply relevant scars, and AVP can
+prove the completed behavior. No library requires another to function.
 
-## Genesis
+---
 
-The pre-product harness froze eight backend, frontend, UI, and roadmap
-envelopes with four positive and four negative controls. The valid Codex run
-achieved 100% precision, recall, and exact-cue accuracy. Two earlier attempts
-remain versioned because they exposed invalid benchmark evidence and an expired
-Claude OAuth session. This proves bounded extraction feasibility, not future
-execution. See [`genesis/`](genesis/).
+## Benchmarks
 
-## Scope
+The published v0.1.0 evidence was recorded under the former Not Yet name. The
+raw artifacts remain unchanged so the results stay auditable.
 
-Wake Me When does not predict the future, schedule jobs, execute actions, manage a
-backlog, accept generic TODOs, or provide open-ended review. It is an `if`
-statement that survives sessions:
+| Suite | Result | Measured evidence |
+| --- | --- | --- |
+| [Genesis capture](genesis/) | PASS | 4/4 positives, 4/4 negatives, and 4/4 exact cues with Codex |
+| [Paired agent](benchmarks/results/v0.1.0-paired-gpt-5.3-codex-spark/REPORT.md) | PASS | 5/5 observed baseline misses became passing deferment-aware arms |
+| [1,024-deferment stress](benchmarks/results/v0.1.0-stress-1024/REPORT.md) | PASS | 128/128 exact event probes plus all five cue kinds |
+| [10,000-deferment stress](benchmarks/results/v0.1.0-stress-10000/REPORT.md) | PASS | 64/64 exact event probes plus corruption and fail-closed checks |
+
+The 10,000-item Windows run measured an 80.937 second cold first wake, followed
+by 0.703 second p50, 0.797 second p95, and 0.875 second maximum warm wakes. The
+cold result remains published rather than being discarded.
+
+These suites prove bounded extraction feasibility, observed paired delivery,
+and deterministic large-corpus retrieval under the disclosed fixtures. They do
+not claim a universal prevention or capture rate.
+
+Reproduction commands, raw events, diffs, summaries, and limitations live in
+[`benchmarks/`](benchmarks/).
+
+---
+
+## Product boundaries
+
+Wake Me When is deliberately narrow:
+
+| WMW is | WMW is not |
+| --- | --- |
+| Repository-local prospective memory | A generic memory database |
+| Conditional activation of proven future work | A scheduler or cron service |
+| Evidence-backed deferment capture | A TODO or issue tracker |
+| Deterministic cue evaluation | Semantic prediction of future events |
+| A host-enforced agent protocol | An autonomous executor |
+| A companion to roadmaps and acceptance systems | A roadmap generator |
+
+Its complete mental model is an `if` statement that survives sessions:
 
 ```text
 if observable_cue_is_true:
     deliver_evidence_backed_deferment
 ```
 
-## Benchmarks
+---
 
-The published v0.1.0 suite, recorded under the former Not Yet name, keeps
-capture, delivery, and scale separate:
+## Architecture and development
 
-- the paired agent run turned 5/5 observed baseline misses into passing Wake Me When
-  arms, with every wake, resolve, and check evidenced;
-- the 1,024- and 10,000-deferment stress runs recovered every target, exercised
-  all five cue kinds, and passed corruption and collection-bound checks.
+Read [ARCHITECTURE.md](ARCHITECTURE.md) for the storage, collection, waking,
+surface, and product-boundary design.
 
-Raw events, diffs, summaries, limitations, and reproduction commands live in
-[`benchmarks/`](benchmarks/).
-
-## Build
+The repository uses one canonical quality gate:
 
 ```bash
 cargo install cargo-llvm-cov tokei --locked
 cargo xtask verify
 ```
 
-The canonical gate enforces formatting, Clippy, at most 500 production Rust
-lines, the complete test suite, at least 95% line coverage, and a packaged
-entrypoint smoke. CI and release call this same command.
+It enforces:
+
+| Gate | Contract |
+| --- | --- |
+| Production Rust | At most 500 code lines under `src/` |
+| Shared runtime coverage | At least 95 percent line coverage without rounding |
+| Static quality | Formatting and Clippy with warnings denied |
+| Behavior | Complete workspace tests |
+| Distribution | Packaged entrypoint smoke |
+
+CI and release call the same command.
+
+---
+
+## Migrating from Not Yet 0.1
+
+The first `wmw init` automatically:
+
+1. renames `.notyet/` to `.wmw/` when the destination does not exist;
+2. preserves every versioned deferment;
+3. replaces the old managed instruction block in place;
+4. installs the current skill and local configuration if missing.
+
+MCP hosts must update tool names from `notyet_*` to `wmw_*`.
+
+---
 
 ## License
 
