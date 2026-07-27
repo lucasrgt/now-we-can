@@ -320,6 +320,7 @@ fn same(item: &Deferment, candidate: &Candidate) -> bool {
 
 fn git(root: &Path, arguments: &[&str]) -> Result<String> {
     let output = Command::new("git")
+        .args(["-c", "core.quotePath=false"])
         .args(arguments)
         .current_dir(root)
         .output()

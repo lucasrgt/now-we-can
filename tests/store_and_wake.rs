@@ -95,6 +95,21 @@ fn collect_requires_two_identical_evidence_bounded_passes_and_deduplicates() {
 }
 
 #[test]
+fn collection_reads_git_quoted_unicode_paths_as_real_untracked_files() {
+    let temp = initialized();
+    git(temp.path(), &["config", "core.quotePath", "true"]);
+    let directory = temp.path().join("src/ações");
+    fs::create_dir_all(&directory).unwrap();
+    fs::write(directory.join("correção.rs"), "pub struct Correcao;\n").unwrap();
+    configure(temp.path(), &[], "accept");
+
+    let result = wmw::collect(temp.path(), request()).unwrap();
+
+    assert_eq!(result.candidates_found, 0);
+    assert!(result.recorded.is_empty());
+}
+
+#[test]
 fn collect_rejects_invented_or_malformed_candidates_and_judge_failures() {
     let temp = initialized();
     change(temp.path());

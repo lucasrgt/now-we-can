@@ -7,8 +7,7 @@ observed.
 
 1. At task start and after context changes, run `wmw wake` with every event
    supplied by the host. Treat returned deferments as due work, not suggestions.
-2. Resolve a completed deferment with `wmw resolve --id <id> --evidence
-   "<proof>"`.
+2. Resolve a completed deferment with `wmw resolve --id <id> --evidence "<proof>"`.
 3. At task completion, the host must run `wmw collect` over the task, plan,
    final response, and diff. Agents must not add deferments manually.
 4. Collection may preserve only a concrete action intentionally blocked by a
