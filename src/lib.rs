@@ -71,20 +71,32 @@ pub fn repository(path: &Path) -> Result<PathBuf> {
     fs::canonicalize(root.trim()).context("resolve repository root")
 }
 
+#[rustfmt::skip]
+fn data_dir(root: &Path) -> PathBuf { match std::env::var_os("CSM_STORAGE_ROOT") { Some(path) => { let path = PathBuf::from(path); let path = if path.is_absolute() { path } else { root.join(path) }; path.join("nwc") }, None => root.join(".nwc") } }
+
+#[rustfmt::skip]
+fn store_exclude(root: &Path) -> String { let relative = data_dir(root).strip_prefix(root).ok().map(|path| path.to_string_lossy().replace('\\', "/")).unwrap_or_else(|| "__csm_external_store__".into()); format!(":(exclude){relative}/**") }
+
 pub fn init(root: &Path, agent_files: &[PathBuf]) -> Result<()> {
     let root = repository(root)?;
-    for legacy in [".wmw", ".notyet"] {
-        if root.join(legacy).exists() && !root.join(".nwc").exists() {
-            fs::rename(root.join(legacy), root.join(".nwc"))?;
+    let managed = std::env::var_os("CSM_STORAGE_ROOT").is_some();
+    if !managed {
+        for legacy in [".wmw", ".notyet"] {
+            if root.join(legacy).exists() && !root.join(".nwc").exists() {
+                fs::rename(root.join(legacy), root.join(".nwc"))?;
+            }
         }
     }
-    fs::create_dir_all(root.join(".nwc/deferments"))?;
-    write_new(root.join(".nwc/config.local.toml"), CONFIG)?;
-    fs::write(root.join(".nwc/SKILL.md"), SKILL)?;
-    append_once(root.join(".gitignore"), IGNORE)?;
-    for file in agent_files {
-        safe_relative(file)?;
-        upsert_block(root.join(file), INSTRUCTIONS)?;
+    let data = data_dir(&root);
+    fs::create_dir_all(data.join("deferments"))?;
+    write_new(data.join("config.local.toml"), CONFIG)?;
+    fs::write(data.join("SKILL.md"), SKILL)?;
+    if !managed {
+        append_once(root.join(".gitignore"), IGNORE)?;
+        for file in agent_files {
+            safe_relative(file)?;
+            upsert_block(root.join(file), INSTRUCTIONS)?;
+        }
     }
     Ok(())
 }
@@ -137,7 +149,7 @@ pub fn collect(root: &Path, request: CollectRequest) -> Result<CollectResult> {
             resolution_evidence: None,
         };
         write_new(
-            root.join(format!(".nwc/deferments/{}.toml", deferment.id)),
+            data_dir(&root).join(format!("deferments/{}.toml", deferment.id)),
             &toml::to_string_pretty(&deferment)?,
         )?;
         recorded.push(deferment);
@@ -165,7 +177,7 @@ pub fn resolve(root: &Path, id: &str, evidence: &str) -> Result<Deferment> {
     let root = repository(root)?;
     require_text("id", id)?;
     require_text("evidence", evidence)?;
-    let path = root.join(format!(".nwc/deferments/{id}.toml"));
+    let path = data_dir(&root).join(format!("deferments/{id}.toml"));
     safe_relative(Path::new(&format!(".nwc/deferments/{id}.toml")))?;
     let mut item: Deferment = toml::from_str(&fs::read_to_string(&path).with_context(|| format!("unknown deferment {id}"))?)?;
     if item.resolved_at.is_some() {
@@ -178,7 +190,7 @@ pub fn resolve(root: &Path, id: &str, evidence: &str) -> Result<Deferment> {
 }
 
 fn load(root: &Path) -> Result<Vec<Deferment>> {
-    let directory = root.join(".nwc/deferments");
+    let directory = data_dir(root).join("deferments");
     if !directory.exists() {
         bail!("Now We Can is not initialized; run nwc init")
     }
@@ -289,14 +301,15 @@ fn judge(root: &Path, prompt: &str) -> Result<Extraction> {
 #[rustfmt::skip]
 fn load_config(root: &Path) -> Result<Config> {
     let user = dirs::config_dir().map(|path| path.join("now-we-can/config.toml"));
-    let path = [Some(root.join(".nwc/config.local.toml")), Some(root.join(".nwc/config.toml")), user].into_iter().flatten().find(|path| path.exists()).ok_or_else(|| anyhow!("missing judge configuration"))?;
+    let path = [Some(data_dir(root).join("config.local.toml")), Some(data_dir(root).join("config.toml")), user].into_iter().flatten().find(|path| path.exists()).ok_or_else(|| anyhow!("missing judge configuration"))?;
     toml::from_str(&fs::read_to_string(path)?).context("invalid judge configuration")
 }
 
 #[rustfmt::skip]
 fn diff(root: &Path, base: &str) -> Result<String> {
-    let mut value = git(root, &["diff", "--no-ext-diff", "--unified=3", base, "--", ".", ":(exclude).nwc/**", ":(exclude).wmw/**", ":(exclude).notyet/**"])?;
-    for path in git(root, &["ls-files", "--others", "--exclude-standard", "--", ".", ":(exclude).nwc/**", ":(exclude).wmw/**", ":(exclude).notyet/**"])?.lines() {
+    let exclude = store_exclude(root);
+    let mut value = git(root, &["diff", "--no-ext-diff", "--unified=3", base, "--", ".", &exclude, ":(exclude).wmw/**", ":(exclude).notyet/**"])?;
+    for path in git(root, &["ls-files", "--others", "--exclude-standard", "--", ".", &exclude, ":(exclude).wmw/**", ":(exclude).notyet/**"])?.lines() {
         let contents = fs::read_to_string(root.join(path)).with_context(|| format!("untracked file is not auditable text: {path}"))?;
         value.push_str(&format!("\ndiff --git a/{path} b/{path}\n--- /dev/null\n+++ b/{path}\n"));
         for line in contents.lines() {

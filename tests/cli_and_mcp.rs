@@ -5,6 +5,7 @@ use nwc::CueKind;
 use serde_json::{Value, json};
 use std::{
     ffi::OsString,
+    fs,
     io::{self, Cursor, Write},
     process::Command,
 };
@@ -30,6 +31,24 @@ fn cli(root: &std::path::Path, args: &[&str]) -> anyhow::Result<(i32, String)> {
     let mut output = Vec::new();
     let code = nwc::run_cli_at(os_args(&arguments), root, &mut Cursor::new(""), &mut output)?;
     Ok((code, String::from_utf8(output).unwrap()))
+}
+
+#[test]
+fn csm_storage_is_opt_in_and_does_not_rewrite_root_files() {
+    let temp = repo();
+    fs::write(temp.path().join("AGENTS.md"), "# Existing\n").unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_nwc"))
+        .current_dir(temp.path())
+        .env("CSM_STORAGE_ROOT", ".csm")
+        .arg("init")
+        .output()
+        .unwrap();
+
+    assert!(output.status.success());
+    assert!(temp.path().join(".csm/nwc/deferments").is_dir());
+    assert!(!temp.path().join(".nwc").exists());
+    assert_eq!(fs::read_to_string(temp.path().join("AGENTS.md")).unwrap(), "# Existing\n");
+    assert!(!temp.path().join(".gitignore").exists());
 }
 
 #[test]
