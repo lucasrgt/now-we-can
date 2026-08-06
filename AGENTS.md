@@ -62,3 +62,16 @@ observed.
 Tests and roadmaps do not replace Now We Can. The host owns collection and
 delivery; neither may depend on an agent voluntarily remembering the tool.
 <!-- nwc:instructions:end -->
+
+
+## Optional Prime Agent adapter
+
+`integrations/prime-agent` is a thin optional host adapter. It may invoke only
+the `nwc` CLI with literal argv and must never parse semantic records or
+reimplement Rust behavior. It activates only for `.nwc/SKILL.md` and
+must remain completely inactive when the Git root contains `csm.toml`. CSM has
+absolute Prime-integration precedence.
+
+When changing the adapter, run `npm ci`, `npm test`, `npm run typecheck`, and
+`npm pack --dry-run` from `integrations/prime-agent` in addition to
+`cargo xtask verify`.

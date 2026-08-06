@@ -359,6 +359,16 @@ another generated index to wake them.
 
 ## Integrations
 
+### Prime Agent
+
+The optional package at `integrations/prime-agent` provides bounded automatic
+`wake`, explicit `/nwc` checks, and a conditional model skill for
+repositories already adopted through `.nwc/SKILL.md`. A root
+`csm.toml` has precedence and suppresses this standalone adapter to prevent
+duplicate retrieval and verification. It never initializes the repository or
+writes semantic records. See the [Prime Agent guide](docs/prime-agent.md).
+
+
 ### CLI
 
 The CLI is the universal surface for shell-capable agents, hooks, CI, and local
